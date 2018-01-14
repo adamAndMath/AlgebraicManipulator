@@ -7,7 +7,6 @@ import algebraic.manipulator.statement.Statement;
 
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,7 +17,7 @@ public abstract class Equation {
     private final Statement[] result;
 
     public Equation(List<Definition> variables, Statement[] result) {
-        this.variables = Collections.unmodifiableList(variables);
+        this.variables = Collections.unmodifiableList(new ArrayList<>(variables));
         this.result = result.clone();
 
         variableMap = variables.stream().collect(Collectors.toMap(Definition::getName, Function.identity()));
@@ -55,7 +54,11 @@ public abstract class Equation {
     }
 
     public int indexOfVariable(String name) {
-        return variables.indexOf(streamVariables().filter(var -> var.getName().equals(name)).findAny().get());
+        for (int i = 0; i < variables.size(); i++)
+            if (name.equals(variables.get(i).getName()))
+                return i;
+
+        throw new IllegalArgumentException("Undefined variable " + name);
     }
 
     public Definition getVariable(int i) {

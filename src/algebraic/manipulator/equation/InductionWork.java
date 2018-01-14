@@ -6,6 +6,7 @@ import algebraic.manipulator.WorkProject;
 import algebraic.manipulator.statement.IntValue;
 import algebraic.manipulator.statement.Operation;
 import algebraic.manipulator.statement.Statement;
+import algebraic.manipulator.statement.Variable;
 import algebraic.manipulator.type.SimpleType;
 
 import java.nio.file.Path;
@@ -15,28 +16,39 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class InductionWork extends Equation {
-    private final String inductive;
-    private final Statement baseState;
+    private final String[] inductive;
+    private final Statement[] baseState;
     private final Work base;
-    private final AssumedWork up;
-    private final AssumedWork down;
+    private final AssumedWork[] up;
+    private final AssumedWork[] down;
 
-    public InductionWork(List<Definition> variables, Statement[] result, String inductive, Statement baseState, Work base) {
+    public InductionWork(List<Definition> variables, Statement[] result, String[] inductive, Statement[] baseState, Work base) {
         super(variables, result);
-        this.inductive = inductive;
-        this.baseState = baseState;
+        this.inductive = inductive.clone();
+        this.baseState = baseState.clone();
         this.base = base;
 
-        up = new AssumedWork(variables, Arrays.stream(result).map(r -> r.set(var -> inductive.equals(var.getName()) ? new Operation("add", var.clone(), new IntValue(1)) : var.clone())).toArray(Statement[]::new), result);
-        down = new AssumedWork(variables, Arrays.stream(result).map(r -> r.set(var -> inductive.equals(var.getName()) ? new Operation("sub", var.clone(), new IntValue(1)) : var.clone())).toArray(Statement[]::new), result);
+        if (inductive.length != baseState.length)
+            throw new IllegalArgumentException("Inductive variables don't match base states");
 
-        if (!containsVariable(inductive))
-            throw new IllegalArgumentException(inductive + " is not a defined variable");
+        up = new AssumedWork[inductive.length];
+        down = new AssumedWork[inductive.length];
 
-        if (!new SimpleType("Integer").is(getVariable(inductive).getType()))
-            throw new IllegalArgumentException("The inductive variable has to be an integer");
+        for (int i = 0; i < inductive.length; i++) {
+            String ind = inductive[i];
 
-        variables.remove(indexOfVariable(inductive));
+            up[i] = new AssumedWork(variables, Arrays.stream(result).map(r -> r.set(var -> ind.equals(var.getName()) ? new Operation("add", var.clone(), new IntValue(1)) : var.clone())).toArray(Statement[]::new), result);
+            down[i] = new AssumedWork(variables, Arrays.stream(result).map(r -> r.set(var -> ind.equals(var.getName()) ? new Operation("sub", var.clone(), new IntValue(1)) : var.clone())).toArray(Statement[]::new), result);
+
+            if (!containsVariable(ind))
+                throw new IllegalArgumentException(ind + " is not a defined variable");
+
+            if (!new SimpleType("Integer").is(getVariable(ind).getType()))
+                throw new IllegalArgumentException("The inductive variable has to be an integer");
+
+            variables.remove(variables.stream().filter(v -> ind.equals(v.getName())).findAny().get());
+        }
+
         if (!base.streamVariables().collect(Collectors.toList()).equals(variables))
             throw new IllegalArgumentException("Variables of base work doesn't mach: " + base.streamVariables().collect(Collectors.toList()) + " and not " + variables);
 
@@ -44,37 +56,62 @@ public class InductionWork extends Equation {
             throw new IllegalArgumentException("Invalid base");
 
         for (int i = 0; i < result.length; i++)
-            if (!result[i].set(var -> inductive.equals(var.getName()) ? baseState.clone() : var.clone()).equals(base.getStatement(i)))
+            if (!result[i].set(this::setBase).equals(base.getStatement(i)))
                 throw new IllegalArgumentException("Invalid base");
+    }
+
+    private Statement setBase(Variable var) {
+        for (int i = 0; i < inductive.length; i++)
+            if (inductive[i].equals(var.getName()))
+                return baseState[i].clone();
+
+        return var.clone();
     }
 
     @Override
     public boolean validate() {
-        return base.validate() && up.validate() && down.validate();
+        for (AssumedWork u : up)
+            if (!u.validate())
+                return false;
+
+        for (AssumedWork d : down)
+            if (!d.validate())
+                return false;
+
+        return base.validate();
     }
 
     @Override
     public Stream<Path> getDependencies(WorkProject project, WorkFile file) {
-        return Stream.of(base, getUp(), getDown()).flatMap(e -> e.getDependencies(project, file));
+        return Stream.concat(Stream.of(base), Stream.of(up, down).flatMap(Arrays::stream))
+                .flatMap(e -> e.getDependencies(project, file));
     }
 
-    public String getInductive() {
-        return inductive;
+    public int indexOf(String var) {
+        for (int i = 0; i < inductive.length; i++)
+            if (var.equals(inductive[i]))
+                return i;
+
+        return -1;
     }
 
-    public Statement getBaseState() {
-        return baseState;
+    public String[] getInductive() {
+        return inductive.clone();
+    }
+
+    public Statement getBaseState(String var) {
+        return baseState[indexOf(var)];
     }
 
     public Work getBase() {
         return base;
     }
 
-    public AssumedWork getUp() {
-        return up;
+    public AssumedWork getUp(String var) {
+        return up[indexOf(var)];
     }
 
-    public AssumedWork getDown() {
-        return down;
+    public AssumedWork getDown(String var) {
+        return down[indexOf(var)];
     }
 }

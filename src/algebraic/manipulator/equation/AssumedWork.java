@@ -19,7 +19,7 @@ public class AssumedWork extends Equation {
 
     public AssumedWork(List<Definition> variables, Statement[] result, Statement[] origin) {
         super(variables, result);
-        this.origin = origin;
+        this.origin = origin.clone();
         this.current = origin.clone();
     }
 

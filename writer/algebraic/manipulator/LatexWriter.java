@@ -151,28 +151,32 @@ public class LatexWriter {
     public static void writeInduction(PrintStream writer, WorkProject project, WorkFile file, InductionWork work) {
         writer.println("Proof by induction");
         writer.print("\\subsection{");
-        writer.print(work.getInductive());
-        writer.print("=");
-        writer.print(work.getBaseState());
+        writeList(writer, Arrays.asList(work.getInductive()), ", ", (w, var) -> {
+            w.print(var);
+            w.print("=");
+            w.print(work.getBaseState(var));
+        });
         writer.println("}");
 
         writeWork(writer, project, file, work.getBase());
 
-        writer.print("\\subsection{");
-        writer.print(work.getInductive());
-        writer.print("'=");
-        writer.println(work.getInductive());
-        writer.println("+1}");
+        writeList(writer, Arrays.asList(work.getInductive()), "", (w, var) -> {
+            w.print("\\subsection{");
+            w.print(var);
+            w.print("'=");
+            w.println(var);
+            w.println("+1}");
 
-        writeAssumedWork(writer, project, file, work.getUp());
+            writeAssumedWork(w, project, file, work.getUp(var));
 
-        writer.print("\\subsection{");
-        writer.print(work.getInductive());
-        writer.print("'=");
-        writer.println(work.getInductive());
-        writer.println("-1}");
+            w.print("\\subsection{");
+            w.print(var);
+            w.print("'=");
+            w.println(var);
+            w.println("-1}");
 
-        writeAssumedWork(writer, project, file, work.getDown());
+            writeAssumedWork(w, project, file, work.getDown(var));
+        });
     }
 
     public static void writeAssumedWork(PrintStream writer, WorkProject project, WorkFile file, AssumedWork work) {
