@@ -1,0 +1,38 @@
+assume Identity(Complex a)
+    a=mult(a,1)=mult(1,a);
+
+assume Commute(Complex a, Complex b)
+    mult(a,b)=mult(b,a);
+
+assume Associate(Complex a, Complex b, Complex c)
+    mult(mult(a,b),c)=mult(a,mult(b,c));
+
+assume Factor(Complex f, Complex a, Complex b)
+    mult(f,add(a,b))=add(mult(f,a),mult(f,b));
+
+work FactorSub(Complex f, Complex a, Complex b) {
+    let 2 sub(mult(f,a),mult(f,b));
+    substitute Sub.Add1[0->2](a,b):0,0,1;
+    substitute Factor[0->1](f,sub(a,b),b):0,0;
+    substitute Sub.Add1[1->0](mult(f,sub(a,b)),mult(f,b)):0;
+} result {
+    mult(f,sub(a,b))=sub(mult(f,a),mult(f,b))
+}
+
+work Singularity(Complex a) {
+    let 3 0;
+    substitute Sub.Inverse[1->0](a):1;
+    substitute Identity[0->1](a):1,0;
+    substitute Identity[0->1](a):1,1;
+    substitute FactorSub[1->0](a,1,1):1;
+    substitute Sub.Inverse[0->1](1):1,1;
+    substitute Commute[0->1](a,0):1;
+
+    substitute Sub.Inverse[1->0](a):2;
+    substitute Identity[0->1](a):2,0;
+    substitute Identity[0->1](a):2,1;
+    substitute FactorSub[1->0](a,1,1):2;
+    substitute Sub.Inverse[0->1](1):2,1;
+} result {
+    0=mult(0,a)=mult(a,0)
+}

@@ -1,0 +1,13 @@
+assume Lim(Func<Complex,Complex> f, Complex x)
+    diff(eval(f,x),x)=lim<h>(div(sub(eval(f,add(x,h)),eval(f,x)),h));
+
+/*work Const(Complex a, Complex x) {
+    let 2 diff(a,x);
+    toeval(c=x:[]):1,0;
+    substitute Lim[0->1](func<c>(a),x):1;
+    fromeval
+}*/
+
+/*work Pow(Complex a, Complex x) {
+    let 2 diff(pow(x,a),x);
+}*/

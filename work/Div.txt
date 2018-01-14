@@ -1,0 +1,62 @@
+assume Mult1(Complex a, Complex b)
+    a=div(mult(a,b),b)=mult(div(a,b),b);
+
+work Identity(Complex a) {
+    let 2 a;
+    substitute Mult1[0->2](a,1):1;
+    substitute Mult.Identity[1->0](div(a,1)):1;
+} result {
+    a=div(a,1)
+}
+
+work Inverse(Complex a) {
+    let 2 1;
+    substitute Mult1[0->1](1,a):0;
+    substitute Mult.Identity[2->0](a):0,0;
+} result {
+    div(a,a)=1
+}
+
+work Mult2(Complex a, Complex b) {
+    let 2 div(a,b);
+    substitute Mult.Identity[0->1](a):1,0;
+    substitute Mult1[0->2](1,b):1,0,1;
+    substitute Mult.Associate[1->0](a,div(1,b),b):1,0;
+    substitute Mult1[1->0](mult(a,div(1,b)),b):1;
+} result {
+    div(a,b)=mult(a,div(1,b))
+}
+
+work Commute(Complex a, Complex b, Complex c) {
+    let 3 div(div(a,b),c);
+    substitute Mult2[0->1](div(a,b),c):1;
+    substitute Mult2[0->1](a,b):1,0;
+    substitute Mult.Associate[0->1](a,div(1,b),div(1,c)):1;
+    substitute Mult.Commute[0->1](div(1,b),div(1,c)):1,1;
+    substitute Mult.Associate[1->0](a,div(1,c),div(1,b)):1;
+    substitute Mult2[1->0](a,c):1,0;
+    substitute Mult2[1->0](div(a,c),b):1;
+
+    substitute Mult1[0->2](a,mult(b,c)):2,0,0;
+    substitute Mult.Commute[0->1](b,c):2,0,0,1;
+    substitute Mult.Associate[1->0](div(a,mult(b,c)),c,b):2,0,0;
+    substitute Mult1[1->0](mult(div(a,mult(b,c)),c),b):2,0;
+    substitute Mult1[1->0](div(a,mult(b,c)),c):2;
+} result {
+    div(div(a,b),c)=div(div(a,c),b)=div(a,mult(b,c))
+}
+
+work Commute2(Complex a, Complex b, Complex c) {
+    let 3 div(mult(a,b),c);
+    substitute Mult2[0->1](mult(a,b),c):1;
+    substitute Mult.Associate[0->1](a,b,div(1,c)):1;
+    substitute Mult2[1->0](b,c):1,1;
+
+    substitute Mult2[0->1](mult(a,b),c):2;
+    substitute Mult.Associate[0->1](a,b,div(1,c)):2;
+    substitute Mult.Commute[0->1](b,div(1,c)):2,1;
+    substitute Mult.Associate[1->0](a,div(1,c),b):2;
+    substitute Mult2[1->0](a,c):2,0;
+} result {
+    div(mult(a,b),c)=mult(a,div(b,c))=mult(div(a,c),b)
+}

@@ -1,0 +1,121 @@
+package algebraic.manipulator;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+public class PathTree<T> {
+    private static class Tree<T> {
+        private final Map<Integer, Tree<T>> children = new HashMap<>();
+        private T leaf;
+
+        Tree<T> sub(int i) {
+            if (leaf != null)
+                throw new IllegalArgumentException();
+
+            if (!children.containsKey(i))
+                children.put(i, new Tree<>());
+            return children.get(i);
+        }
+
+        void set(T leaf) {
+            if (!children.isEmpty())
+                throw new IllegalArgumentException();
+
+            this.leaf = leaf;
+        }
+
+        T get() {
+            return leaf;
+        }
+    }
+
+    private final Map<Integer, PathTree<T>> children;
+    private final T leaf;
+
+    private final boolean empty;
+
+    public PathTree() {
+        children = Map.of();
+        leaf = null;
+        empty = true;
+    }
+
+    public<S> PathTree(Collection<S> collection, Function<S, int[][]> pos, Function<S, T> leaf) {
+        this(build(collection, pos, leaf));
+    }
+
+    private PathTree(Tree<T> tree) {
+        children = tree.children.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new PathTree<>(e.getValue())));
+        leaf = tree.get();
+        empty = leaf == null && children.values().stream().allMatch(PathTree::isEmpty);
+    }
+
+    public PathTree(T leaf) {
+        children = Map.of();
+        this.leaf = leaf;
+        empty = leaf == null;
+    }
+
+    public PathTree(Map<Integer, PathTree<T>> children) {
+        this.children = Collections.unmodifiableMap(children);
+        this.leaf = null;
+        empty = children.values().stream().allMatch(PathTree::isEmpty);
+    }
+
+    public PathTree(int key, PathTree<T> child) {
+        this.children = Map.of(key, child);
+        this.leaf = null;
+        empty = children.values().stream().allMatch(PathTree::isEmpty);
+    }
+
+    public boolean isLeaf() {
+        return leaf != null;
+    }
+
+    public T getLeaf() {
+        return leaf;
+    }
+
+    public PathTree<T> sub(int i) {
+        return children.get(i);
+    }
+
+    public PathTree<T> subOrEmpty(int i) {
+        return children.getOrDefault(i, new PathTree<>());
+    }
+
+    public boolean isEmpty() {
+        return empty;
+    }
+
+    public<S> PathTree<S> map(Function<T, S> function) {
+        return isLeaf() ? new PathTree<>(function.apply(getLeaf())) : new PathTree<>(children.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().map(function))));
+    }
+
+    @Override
+    public String toString() {
+        return isLeaf() ? getLeaf().toString() : children.entrySet().stream().map(e -> e.getKey() + ": " + e.getValue()).collect(Collectors.joining(", ", "{", "}"));
+    }
+
+    private static<T,S> Tree<T> build(Collection<S> collection, Function<S, int[][]> pos, Function<S, T> leaf) {
+        Tree<T> root = new Tree<>();
+
+        for (S obj : collection) {
+            for (int[] position : pos.apply(obj)) {
+                Tree<T> tree = root;
+
+                for (int i : position) {
+                    tree = tree.sub(i);
+                }
+
+                tree.set(leaf.apply(obj));
+            }
+        }
+
+        return root;
+    }
+}

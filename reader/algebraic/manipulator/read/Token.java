@@ -1,0 +1,3 @@
+package algebraic.manipulator.read;
+
+public enum Token {EOF, LESS, GREAT, LPAR, RPAR, LSQR, RSQR, LCURL, RCURL, VBAR, DOT, COMMA, COLON, SEMI, EQUAL, SLASH, BACKSLASH, DASH, PLUS, ARROW, STRING, INT}
