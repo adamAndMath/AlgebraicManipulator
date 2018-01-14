@@ -11,15 +11,17 @@ import static java.util.stream.Collectors.toList;
 
 public class LatexOperationDefault {
     public static void Setup() {
-        LatexWriter.operationWriters.put("add", getByOperationWriter(" + ", 1));
-        LatexWriter.operationWriters.put("sub", getByOperationWriter(" - ", 1));
-        LatexWriter.operationWriters.put("mult", getByOperationWriter(" \\cdot ", 2));
-        LatexWriter.operationWriters.put("div", LatexOperationDefault::latexDiv);
-        LatexWriter.operationWriters.put("rec", LatexOperationDefault::latexRec);
-        LatexWriter.operationWriters.put("sum", LatexOperationDefault::latexSum);
-        LatexWriter.operationWriters.put("prod", LatexOperationDefault::latexProd);
-        LatexWriter.operationWriters.put("eval", LatexOperationDefault::latexEval);
-        LatexWriter.operationWriters.put("func", LatexOperationDefault::latexFunc);
+        LatexWriter.operationWriters.put("add", getBiOperationWriter(" + ", 1));
+        LatexWriter.operationWriters.put("sub", getBiOperationWriter(" - ", 1));
+        LatexWriter.operationWriters.put("mult", getBiOperationWriter(" \\cdot ", 2));
+        LatexWriter.operationWriters.put("div", LatexOperationDefault::div);
+        LatexWriter.operationWriters.put("rec", LatexOperationDefault::rec);
+        LatexWriter.operationWriters.put("sum", LatexOperationDefault::sum);
+        LatexWriter.operationWriters.put("prod", LatexOperationDefault::prod);
+        LatexWriter.operationWriters.put("eval", LatexOperationDefault::eval);
+        LatexWriter.operationWriters.put("func", LatexOperationDefault::func);
+        LatexWriter.operationWriters.put("lim", LatexOperationDefault::lim);
+        LatexWriter.operationWriters.put("diff", LatexOperationDefault::diff);
 
         LatexWriter.typeNames.put("Natural", "\\mathbb{N}");
         LatexWriter.typeNames.put("Integer", "\\mathbb{Z}");
@@ -28,11 +30,11 @@ public class LatexOperationDefault {
         LatexWriter.typeNames.put("Complex", "\\mathbb{C}");
     }
 
-    private static LatexWriter.OperationWriter getByOperationWriter(String separator, int bind) {
-        return (writer, operation, textColors, backColor, binding) -> latexBiOperator(writer, operation, textColors, backColor, binding, separator, bind);
+    private static LatexWriter.OperationWriter getBiOperationWriter(String separator, int bind) {
+        return (writer, operation, textColors, backColor, binding) -> biOperator(writer, operation, textColors, backColor, binding, separator, bind);
     }
 
-    private static void latexBiOperator(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding, String separator, int bind) {
+    private static void biOperator(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding, String separator, int bind) {
         if (operation.dummyCount() != 0 || operation.parameterCount() != 2) {
             LatexWriter.defaultWriter(writer, operation, textColor, backColor);
             return;
@@ -45,7 +47,7 @@ public class LatexOperationDefault {
         if (binding > bind) writer.print("\\right)");
     }
 
-    private static void latexDiv(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
+    private static void div(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
         if (operation.dummyCount() != 0 || operation.parameterCount() != 2) {
             LatexWriter.defaultWriter(writer, operation, textColor, backColor);
             return;
@@ -58,7 +60,7 @@ public class LatexOperationDefault {
         writer.print("}");
     }
 
-    private static void latexRec(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
+    private static void rec(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
         if (operation.dummyCount() != 2 || operation.parameterCount() != 3) {
             LatexWriter.defaultWriter(writer, operation, textColor, backColor);
             return;
@@ -76,7 +78,7 @@ public class LatexOperationDefault {
         LatexWriter.writeStatement(writer, operation.getParameter(0), textColor.subOrEmpty(0), backColor.subOrEmpty(0), Integer.MAX_VALUE);
     }
 
-    private static void latexSum(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
+    private static void sum(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
         if (operation.dummyCount() != 1 || operation.parameterCount() != 3) {
             LatexWriter.defaultWriter(writer, operation, textColor, backColor);
             return;
@@ -92,7 +94,7 @@ public class LatexOperationDefault {
         LatexWriter.writeStatement(writer, operation.getParameter(0), textColor.subOrEmpty(0), backColor.subOrEmpty(0), Integer.MAX_VALUE);
     }
 
-    private static void latexProd(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
+    private static void prod(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
         if (operation.dummyCount() != 1 || operation.parameterCount() != 3) {
             LatexWriter.defaultWriter(writer, operation, textColor, backColor);
             return;
@@ -108,7 +110,7 @@ public class LatexOperationDefault {
         LatexWriter.writeStatement(writer, operation.getParameter(0), textColor.subOrEmpty(0), backColor.subOrEmpty(0), Integer.MAX_VALUE);
     }
 
-    private static void latexEval(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
+    private static void eval(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
         if (operation.dummyCount() != 0 || operation.parameterCount() == 0) {
             LatexWriter.defaultWriter(writer, operation, textColor, backColor);
             return;
@@ -133,8 +135,7 @@ public class LatexOperationDefault {
         writer.print("\\right)");
     }
 
-    public static void latexFunc(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
-
+    public static void func(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
         writer.print("\\underset{");
         LatexWriter.writeList(writer, IntStream.range(0, operation.dummyCount()).mapToObj(operation::getDummy).collect(toList()), ",", PrintStream::print);
 
@@ -149,5 +150,33 @@ public class LatexOperationDefault {
         }
 
         writer.print("\\right)");
+    }
+
+    public static void lim(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
+        if (operation.dummyCount() == 1 || operation.parameterCount() == 2) {
+            LatexWriter.defaultWriter(writer, operation, textColor, backColor);
+            return;
+        }
+
+        writer.print("\\lim_{");
+        writer.print(operation.getDummy(0));
+        writer.print("\\to ");
+        LatexWriter.writeStatement(writer, operation.getParameter(0), textColor.subOrEmpty(0), backColor.subOrEmpty(0));
+        writer.print("}");
+
+        LatexWriter.writeStatement(writer, operation.getParameter(1), textColor.subOrEmpty(1), backColor.subOrEmpty(1), Integer.MAX_VALUE);
+    }
+
+    public static void diff(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
+        if (operation.dummyCount() == 0 || operation.parameterCount() == 2) {
+            LatexWriter.defaultWriter(writer, operation, textColor, backColor);
+            return;
+        }
+
+        writer.print("\\frac{\\mathrm d}{\\mathrm d ");
+        LatexWriter.writeStatement(writer, operation.getParameter(1), textColor.subOrEmpty(1), backColor.subOrEmpty(1), Integer.MAX_VALUE);
+        writer.print("}");
+
+        LatexWriter.writeStatement(writer, operation.getParameter(0), textColor.subOrEmpty(0), backColor.subOrEmpty(0), Integer.MAX_VALUE);
     }
 }
