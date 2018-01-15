@@ -1,0 +1,10 @@
+import base.Add;
+import base.Sub;
+import base.Mult;
+import base.Div;
+
+assume Rec(Func<List<Integer,Complex>,Complex> f, Complex i, Integer n)
+    rec<j,r>(eval(f,j,r),i,n)=eval(f,n,rec<j,r>(eval(f,j,r),i,sub(n,1)));
+
+assume Identity(Func<List<Integer,Complex>,Complex> f, Complex i)
+    rec<j,r>(eval(f,j,r),i,0)=i;

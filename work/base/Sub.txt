@@ -47,7 +47,7 @@ work Commute(Complex a, Complex b, Complex c) {
 }
 
 work Commute2(Complex a, Complex b, Complex c) {
-    let 3 sub(add(a,b),c);
+    let 4 sub(add(a,b),c);
     substitute Add2[0->1](add(a,b),c):1;
     substitute Add.Associate[0->1](a,b,sub(0,c)):1;
     substitute Add2[1->0](b,c):1,1;
@@ -57,6 +57,24 @@ work Commute2(Complex a, Complex b, Complex c) {
     substitute Add.Commute[0->1](b,sub(0,c)):2,1;
     substitute Add.Associate[1->0](a,sub(0,c),b):2;
     substitute Add2[1->0](a,c):2,0;
+
+    substitute Add2[0->1](add(a,b),c):3;
+    substitute Add.Associate[0->1](a,b,sub(0,c)):3;
+    substitute Add.Commute[0->1](b,sub(0,c)):3,1;
+    substitute Add.Associate[1->0](a,sub(0,c),b):3;
+    substitute Add2[1->0](a,c):3,0;
+    substitute Add1[0->2](c,b):3,0,1;
+    substitute Commute[2->0](a,sub(c,b),b):3,0;
+    substitute Add1[2->0](sub(a,sub(c,b)),b):3;
 } result {
-    sub(add(a,b),c)=add(a,sub(b,c))=add(sub(a,c),b)
+    sub(add(a,b),c)=add(a,sub(b,c))=add(sub(a,c),b)=sub(a,sub(c,b))
+}
+
+work Negate(Complex a) {
+    let 2 a;
+    substitute Add1[0->1](a,0):1;
+    substitute Add.Commute[0->1](a,0):1,0;
+    substitute Commute2[0->3](0,a,0):1;
+} result {
+    a=sub(0,sub(0,a))
 }

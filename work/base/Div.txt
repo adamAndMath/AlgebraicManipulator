@@ -60,3 +60,25 @@ work Commute2(Complex a, Complex b, Complex c) {
 } result {
     div(mult(a,b),c)=mult(a,div(b,c))=mult(div(a,c),b)
 }
+
+work Distribute(Complex f, Complex a, Complex b) {
+    let 2 div(add(a,b),f);
+    substitute Mult2[0->1](add(a,b),f):1;
+    substitute Mult.Commute[0->1](add(a,b),div(1,f)):1;
+    substitute Mult.Distribute[0->1](div(1,f),a,b):1;
+    substitute Mult.Commute[1->0](a,div(1,f)):1,0;
+    substitute Mult.Commute[1->0](b,div(1,f)):1,1;
+    substitute Mult2[1->0](a,f):1,0;
+    substitute Mult2[1->0](b,f):1,1;
+} result {
+    div(add(a,b),f)=add(div(a,f),div(b,f))
+}
+
+work DistributeSub(Complex f, Complex a, Complex b) {
+    let 2 sub(div(a,f),div(b,f));
+    substitute Sub.Add1[0->2](a,b):0,0,0;
+    substitute Distribute[0->1](f,sub(a,b),b):0,0;
+    substitute Sub.Add1[1->0](div(sub(a,b),f),div(b,f)):0;
+} result {
+    div(sub(a,b),f)=sub(div(a,f),div(b,f))
+}
