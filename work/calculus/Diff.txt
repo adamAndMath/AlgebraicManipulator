@@ -1,4 +1,4 @@
-assume Lim(Func<Complex,Complex> f, Complex x)
+assume Lim<h>(Func<Complex,Complex> f, Complex x)
     diff(eval(f,x),x)=lim<h>(h,div(sub(eval(f,add(x,h)),eval(f,x)),h));
 
 /*work Const(Complex a, Complex x) {
