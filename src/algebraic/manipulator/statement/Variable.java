@@ -43,6 +43,11 @@ public class Variable extends Statement {
     }
 
     @Override
+    public Statement setAll(Function<Variable, Statement> function) {
+        return function.apply(this);
+    }
+
+    @Override
     public <T> PathTree<T> tree(Function<Variable, T> function) {
         return new PathTree<>(function.apply(this));
     }

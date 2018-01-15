@@ -5,6 +5,7 @@ import algebraic.manipulator.WorkFile;
 import algebraic.manipulator.WorkProject;
 import algebraic.manipulator.manipulation.Manipulation;
 import algebraic.manipulator.statement.Statement;
+import algebraic.manipulator.statement.Variable;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -16,8 +17,8 @@ public class Work extends Equation {
     private final List<Manipulation> manipulations = new ArrayList<>();
     private Statement[] current;
 
-    public Work(List<Definition> variables, Statement[] result, int amount, Statement origin) {
-        super(variables, result);
+    public Work(List<Variable> dummy, List<Definition> variables, Statement[] result, int amount, Statement origin) {
+        super(dummy, variables, result);
         this.origin = origin;
         this.amount = amount;
 

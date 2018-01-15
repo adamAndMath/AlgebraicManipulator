@@ -55,7 +55,7 @@ public class WorkTemplate extends EquationTemplate {
 
     @Override
     public Work toEquation(WorkProject project, WorkFile file) {
-        Work work = new Work(parameters, result.toArray(new Statement[0]), amount, origin);
+        Work work = new Work(dummy, parameters, result.toArray(new Statement[0]), amount, origin);
 
         for (int i = 0; i < manipulations.size(); i++) {
             try {

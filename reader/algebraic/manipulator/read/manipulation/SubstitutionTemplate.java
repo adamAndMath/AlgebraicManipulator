@@ -17,6 +17,7 @@ public class SubstitutionTemplate implements ManipulationTemplate {
     public Path path;
     public int from;
     public int to;
+    public List<String> dummy;
     public List<Statement> parameters;
     public List<Integer> position;
 
@@ -28,6 +29,12 @@ public class SubstitutionTemplate implements ManipulationTemplate {
         reader.assertIgnore(Token.ARROW);
         to = reader.readInt();
         reader.assertIgnore(Token.RSQR);
+
+        if (reader.isRead(Token.LESS)) {
+            dummy = reader.readList(Token.COMMA, TokenReader::readString);
+            reader.assertIgnore(Token.GREAT);
+        } else dummy = List.of();
+
         reader.assertIgnore(Token.LPAR);
 
         parameters = !reader.isCurrent(Token.RPAR)
@@ -52,6 +59,7 @@ public class SubstitutionTemplate implements ManipulationTemplate {
                 from,
                 to,
                 position.stream().mapToInt(i -> i).toArray(),
+                dummy,
                 parameters
         );
     }

@@ -106,8 +106,9 @@ public class InductionTemplate extends EquationTemplate {
 
     @Override
     public Equation toEquation(WorkProject project, WorkFile file) {
+        base.dummy = dummy;
         base.parameters = parameters.stream().filter(par -> !inductives.contains(par.getName())).collect(toList());
-        InductionWork induction = new InductionWork(parameters, result.toArray(new Statement[0]), inductives.toArray(new String[0]), baseStates.toArray(new Statement[0]), base.toEquation(project, file));
+        InductionWork induction = new InductionWork(dummy, parameters, result.toArray(new Statement[0]), inductives.toArray(new String[0]), baseStates.toArray(new Statement[0]), base.toEquation(project, file));
 
         for (int i = 0; i < inductives.size(); i++) {
             String ind = inductives.get(i);

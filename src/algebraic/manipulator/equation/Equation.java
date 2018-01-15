@@ -2,8 +2,8 @@ package algebraic.manipulator.equation;
 
 import algebraic.manipulator.Definition;
 import algebraic.manipulator.WorkFile;
-import algebraic.manipulator.WorkProject;
 import algebraic.manipulator.statement.Statement;
+import algebraic.manipulator.statement.Variable;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -12,15 +12,29 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class Equation {
+    private final List<Variable> dummy;
     private final List<Definition> variables;
     private final Map<String, Definition> variableMap;
     private final Statement[] result;
 
-    public Equation(List<Definition> variables, Statement[] result) {
+    public Equation(List<Variable> dummy, List<Definition> variables, Statement[] result) {
+        this.dummy = Collections.unmodifiableList(new ArrayList<>(dummy));
         this.variables = Collections.unmodifiableList(new ArrayList<>(variables));
         this.result = result.clone();
 
         variableMap = variables.stream().collect(Collectors.toMap(Definition::getName, Function.identity()));
+        Set<String> dums = dummy.stream().map(Variable::getName).collect(Collectors.toSet());
+        Set<String> vars = Stream.concat(variables.stream().map(Definition::getName), dums.stream()).collect(Collectors.toSet());
+
+        for (Statement s : result) {
+            for (String v : s.getVariables())
+                if (!vars.contains(v))
+                    throw new IllegalArgumentException("Undefined variable " + v + " in result");
+
+            for (String d : s.getDummies())
+                if (!dums.contains(d))
+                    throw new IllegalArgumentException("Unregistered dummy " + d + " in result");
+        }
     }
 
     public abstract boolean validate();
@@ -37,12 +51,15 @@ public abstract class Equation {
         return result.clone();
     }
 
+    public List<Variable> dummies() {
+        return dummy;
+    }
     public Set<String> variableNames() {
         return variableMap.keySet();
     }
 
-    public Stream<Definition> streamVariables() {
-        return variables.stream();
+    public List<Definition> variables() {
+        return variables;
     }
 
     public boolean containsVariable(String name) {

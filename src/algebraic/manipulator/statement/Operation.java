@@ -98,6 +98,15 @@ public class Operation extends Statement {
     }
 
     @Override
+    public Statement setAll(Function<Variable, Statement> function) {
+        return new Operation(
+                getName(),
+                Arrays.stream(dummies).map(function).toArray(Variable[]::new),
+                Arrays.stream(parameters).map(par -> par.setAll(function)).toArray(Statement[]::new)
+        );
+    }
+
+    @Override
     public <T> PathTree<T> tree(Function<Variable, T> function) {
         Map<Integer, PathTree<T>> map = new HashMap<>();
 

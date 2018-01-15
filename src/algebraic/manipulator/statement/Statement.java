@@ -16,6 +16,10 @@ public abstract class Statement {
         return clone();
     }
 
+    public Statement setAll(Function<Variable, Statement> function) {
+        return clone();
+    }
+
     public<T> PathTree<T> tree(Function<Variable, T> function) {
         return new PathTree<>();
     }

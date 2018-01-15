@@ -154,6 +154,13 @@ public class WorkReader {
                 throw new IOException(reader.getPos() + " Unknown keyword " + keyWork);
 
             String name = reader.readString();
+            List<Variable> dummy = List.of();
+
+            if (reader.isRead(Token.LESS)) {
+                dummy = reader.readList(Token.COMMA, WorkReader::readVariable);
+                reader.assertIgnore(Token.GREAT);
+            }
+
             reader.assertIgnore(Token.LPAR);
 
             List<Definition> parameters = reader.isCurrent(Token.STRING)
@@ -163,6 +170,7 @@ public class WorkReader {
             reader.assertIgnore(Token.RPAR);
 
             EquationTemplate equation = workReaders.get(keyWork).read(reader);
+            equation.dummy = dummy;
             equation.parameters = parameters;
 
             file.add(name, equation);

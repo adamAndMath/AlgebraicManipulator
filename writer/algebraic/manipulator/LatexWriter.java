@@ -68,8 +68,7 @@ public class LatexWriter {
     public static void writeAssumption(PrintStream writer, Assumption assumption) {
         writer.print("$");
 
-        List<Definition> variables = assumption.streamVariables().collect(toList());
-        writeDefinitions(writer, variables, (w, var) -> w.print(var.getName()));
+        writeDefinitions(writer, assumption.variables(), (w, var) -> w.print(var.getName()));
 
         writeList(writer, Arrays.asList(assumption.getResult()), "=", (w, s) ->
                 writeStatement(w, s, new PathTree<>(), new PathTree<>())
@@ -230,7 +229,7 @@ public class LatexWriter {
             Substitution substitution = (Substitution) manipulation;
             Equation work = substitution.getWork(project, file);
 
-            List<String> variables = work.streamVariables().map(Definition::getName).collect(toList());
+            List<String> variables = work.variables().stream().map(Definition::getName).collect(toList());
             return surroundTree(work.getStatement(substitution.getFrom()).tree(var -> variables.contains(var.getName()) ? colors.get(variables.indexOf(var.getName())) : null), substitution.getPosition());
         }
 
@@ -261,7 +260,7 @@ public class LatexWriter {
             Substitution substitution = (Substitution) manipulation;
             Equation work = substitution.getWork(project, file);
 
-            List<String> variables = work.streamVariables().map(Definition::getName).collect(toList());
+            List<String> variables = work.variables().stream().map(Definition::getName).collect(toList());
             return surroundTree(work.getStatement(substitution.getTo()).tree(var -> variables.contains(var.getName()) ? colors.get(variables.indexOf(var.getName())) : null), substitution.getPosition());
         }
 
@@ -310,7 +309,7 @@ public class LatexWriter {
     public static void writeSubstitution(PrintStream writer, WorkProject project, WorkFile file, Substitution substitution) {
         Path workPath = file.absolutePath(substitution.getWorkPath());
         Equation work = substitution.getWork(project, file);
-        List<String> variables = work.streamVariables().map(Definition::getName).collect(toList());
+        List<String> variables = work.variables().stream().map(Definition::getName).collect(toList());
 
         Statement from = work.getStatement(substitution.getFrom());
         Statement to = work.getStatement(substitution.getTo());
@@ -318,7 +317,7 @@ public class LatexWriter {
         writer.print("\\hyperref[");
         writeList(writer, workPath, ":", PrintStream::print);
         writer.print("]{$");
-        writeDefinitions(writer, work.streamVariables().collect(toList()), (w, var) -> {
+        writeDefinitions(writer, work.variables().stream().collect(toList()), (w, var) -> {
             w.print("\\textcolor{");
             w.print(colors.get(variables.indexOf(var.getName())));
             w.print("}{");

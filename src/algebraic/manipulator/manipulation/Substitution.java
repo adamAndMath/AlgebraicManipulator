@@ -15,13 +15,15 @@ public class Substitution implements Manipulation {
     private final int from;
     private final int to;
     private final int[] position;
+    private final List<String> dummy;
     private final List<Statement> values;
 
-    public Substitution(Path workPath, int from, int to, int[] position, List<Statement> values) {
+    public Substitution(Path workPath, int from, int to, int[] position, List<String> dummy, List<Statement> values) {
         this.workPath = workPath;
         this.from = from;
         this.to = to;
         this.position = position;
+        this.dummy = dummy;
         this.values = values;
     }
 
@@ -57,8 +59,11 @@ public class Substitution implements Manipulation {
         if (values.size() != work.variableNames().size())
             throw new IllegalStateException("Parameter count does't match referred work");
 
-        Statement fromStatement = work.getStatement(from).set(v -> set(work, v));
-        Statement toStatement = work.getStatement(to).set(v -> set(work, v));
+        if (dummy.size() != work.dummies().size())
+            throw new IllegalStateException("Dummy count does't match referred work");
+
+        Statement fromStatement = work.getStatement(from).setAll(v -> set(work, v));
+        Statement toStatement = work.getStatement(to).setAll(v -> set(work, v));
 
         return statement.replace(position, 0, i, s -> replace(s, fromStatement, toStatement));
     }
@@ -71,8 +76,11 @@ public class Substitution implements Manipulation {
     }
 
     private Statement set(Equation work, Variable variable) {
-        return work.containsVariable(variable.getName())
-                ? values.get(work.indexOfVariable(variable.getName())).clone()
-                : variable.clone();
+        int index = work.dummies().indexOf(variable);
+
+        return index != -1 ? new Variable(dummy.get(index))
+                : work.containsVariable(variable.getName())
+                    ? values.get(work.indexOfVariable(variable.getName())).clone()
+                    : variable.clone();
     }
 }

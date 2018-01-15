@@ -11,7 +11,7 @@ public class Main {
 
         LatexWriter.colors.add("red");
         LatexWriter.colors.add("blue");
-        LatexWriter.colors.add("green");
+        LatexWriter.colors.add("olive");
         LatexWriter.colors.add("orange");
         LatexWriter.colors.add("yellow");
 

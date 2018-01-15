@@ -2,7 +2,6 @@ package algebraic.manipulator.equation;
 
 import algebraic.manipulator.Definition;
 import algebraic.manipulator.WorkFile;
-import algebraic.manipulator.WorkProject;
 import algebraic.manipulator.statement.IntValue;
 import algebraic.manipulator.statement.Operation;
 import algebraic.manipulator.statement.Statement;
@@ -22,8 +21,8 @@ public class InductionWork extends Equation {
     private final AssumedWork[] up;
     private final AssumedWork[] down;
 
-    public InductionWork(List<Definition> variables, Statement[] result, String[] inductive, Statement[] baseState, Work base) {
-        super(variables, result);
+    public InductionWork(List<Variable> dummy, List<Definition> variables, Statement[] result, String[] inductive, Statement[] baseState, Work base) {
+        super(dummy, variables, result);
         this.inductive = inductive.clone();
         this.baseState = baseState.clone();
         this.base = base;
@@ -37,8 +36,8 @@ public class InductionWork extends Equation {
         for (int i = 0; i < inductive.length; i++) {
             String ind = inductive[i];
 
-            up[i] = new AssumedWork(variables, Arrays.stream(result).map(r -> r.set(var -> ind.equals(var.getName()) ? new Operation("add", var.clone(), new IntValue(1)) : var.clone())).toArray(Statement[]::new), result);
-            down[i] = new AssumedWork(variables, Arrays.stream(result).map(r -> r.set(var -> ind.equals(var.getName()) ? new Operation("sub", var.clone(), new IntValue(1)) : var.clone())).toArray(Statement[]::new), result);
+            up[i] = new AssumedWork(dummy, variables(), Arrays.stream(result).map(r -> r.set(var -> ind.equals(var.getName()) ? new Operation("add", var.clone(), new IntValue(1)) : var.clone())).toArray(Statement[]::new), result);
+            down[i] = new AssumedWork(dummy, variables(), Arrays.stream(result).map(r -> r.set(var -> ind.equals(var.getName()) ? new Operation("sub", var.clone(), new IntValue(1)) : var.clone())).toArray(Statement[]::new), result);
 
             if (!containsVariable(ind))
                 throw new IllegalArgumentException(ind + " is not a defined variable");
@@ -49,8 +48,8 @@ public class InductionWork extends Equation {
             variables.remove(variables.stream().filter(v -> ind.equals(v.getName())).findAny().get());
         }
 
-        if (!base.streamVariables().collect(Collectors.toList()).equals(variables))
-            throw new IllegalArgumentException("Variables of base work doesn't mach: " + base.streamVariables().collect(Collectors.toList()) + " and not " + variables);
+        if (!base.variables().equals(variables))
+            throw new IllegalArgumentException("Variables of base work doesn't mach: " + base.variables() + " and not " + variables);
 
         if (count() != base.count())
             throw new IllegalArgumentException("Invalid base");

@@ -24,6 +24,6 @@ public class AssumptionTemplate extends EquationTemplate {
 
     @Override
     public Assumption toEquation(WorkProject project, WorkFile file) {
-        return new Assumption(parameters, result.toArray(new Statement[0]));
+        return new Assumption(dummy, parameters, result.toArray(new Statement[0]));
     }
 }
