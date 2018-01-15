@@ -37,8 +37,8 @@ public class Work extends Equation {
     }
 
     @Override
-    public Stream<Path> getDependencies(WorkProject project, WorkFile file) {
-        return manipulations.stream().flatMap(m -> m.getDependencies(project, file));
+    public Stream<Path> getDependencies(WorkFile file) {
+        return manipulations.stream().flatMap(m -> m.getDependencies(file));
     }
 
     public Statement getOrigin() {

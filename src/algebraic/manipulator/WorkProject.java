@@ -21,22 +21,19 @@ public class WorkProject {
     public static class WPFolder implements WP {
         public final Map<String, WP> contents = new HashMap<>();
 
-        public Set<Map.Entry<String, WP>> entries() {
-            return contents.entrySet();
-        }
-
         @Override
         public <T extends WP, R> R get(Path path, BiFunction<Path, T, R> function) {
-            return path == null
-                    ? function.apply(null, (T) this)
-                    : contents.get(path.getName(0).toString()).get(path.subpath(1, path.getNameCount()), function);
+            if (path == null) return function.apply(null, (T) this);
+            return contents.get(path.getName(0).toString()).get(path.subpath(1, path.getNameCount()), function);
         }
 
         @Override
         public <T extends WP, R> R get(Path path, Function<T, R> function) {
-            return path == null
-                    ? function.apply((T) this)
-                    : contents.get(path.getName(0).toString()).get(path.subpath(1, path.getNameCount()), function);
+            if (path == null) return function.apply((T) this);
+            String folder = path.getName(0).toString();
+            if (!contents.containsKey(folder))
+                contents.put(folder, new WPFolder());
+            return contents.get(folder).get(path.getNameCount() == 1 ? null : path.subpath(1, path.getNameCount()), function);
         }
 
         @Override
@@ -48,7 +45,12 @@ public class WorkProject {
         @Override
         public <T extends WP> void run(Path path, Consumer<T> consumer) {
             if (path == null) consumer.accept((T) this);
-            else contents.get(path.getName(0).toString()).run(path.subpath(1, path.getNameCount()), consumer);
+            else {
+                String folder = path.getName(0).toString();
+                if (!contents.containsKey(folder))
+                    contents.put(folder, new WPFolder());
+                contents.get(folder).run(path.getNameCount() == 1 ? null : path.subpath(1, path.getNameCount()), consumer);
+            }
         }
     }
 
@@ -94,14 +96,7 @@ public class WorkProject {
 
     public Equation getWork(WorkFile file, Path path) {
         if (path.getNameCount() == 1) return file.get(path.toString());
-        return getWork(path);
-    }
-
-    public Path absolutePath(WorkFile file, Path path) {
-        if (path.getNameCount() == 1)
-            return file.getPath().resolve(path);
-
-        return path;
+        return getWork(file.absolutePath(path));
     }
 
     public void put(WorkFile file, Path path) {
@@ -133,7 +128,7 @@ public class WorkProject {
             indexMap.put(files.get(i).getPath(), i);
 
         List<Set<Integer>> graph = files.stream()
-                .map(f -> f.getDependencies(this).map(Path::getParent).map(indexMap::get).collect(Collectors.toSet()))
+                .map(f -> f.getDependencies().map(Path::getParent).map(indexMap::get).collect(Collectors.toSet()))
                 .collect(Collectors.toCollection(ArrayList::new));
 
         List<Set<Integer>> graphInverse = new ArrayList<>(graph.size());

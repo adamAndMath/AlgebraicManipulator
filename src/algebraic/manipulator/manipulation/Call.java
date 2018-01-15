@@ -27,7 +27,7 @@ public class Call implements Manipulation {
     }
 
     @Override
-    public Stream<Path> getDependencies(WorkProject project, WorkFile file) {
+    public Stream<Path> getDependencies(WorkFile file) {
         return Stream.empty();
     }
 

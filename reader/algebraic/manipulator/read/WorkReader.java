@@ -14,6 +14,7 @@ import algebraic.manipulator.type.Type;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -126,11 +127,28 @@ public class WorkReader {
         return manipulation;
     }
 
+    public static void readImport(TokenReader reader, FileTemplate file) throws IOException {
+        Path path = reader.readReduce(Token.DOT, r -> Paths.get(r.readString()), (r, p) -> p.resolve(r.readString()));
+        String key = path.getFileName().toString();
+
+        if (!reader.isRead(Token.SEMI)) {
+            key = reader.readString();
+            reader.assertIgnore(Token.SEMI);
+        }
+
+        file.importFile(key, path);
+    }
+
     public static FileTemplate readFile(TokenReader reader, Path path) throws IOException {
         FileTemplate file = new FileTemplate(path);
 
         while (!reader.isCurrent(Token.EOF)) {
             String keyWork = reader.readString();
+
+            if ("import".equals(keyWork)) {
+                readImport(reader, file);
+                continue;
+            }
 
             if (!workReaders.containsKey(keyWork))
                 throw new IOException(reader.getPos() + " Unknown keyword " + keyWork);

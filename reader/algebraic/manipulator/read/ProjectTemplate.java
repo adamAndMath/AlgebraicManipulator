@@ -73,13 +73,6 @@ public class ProjectTemplate {
         files.add(file);
     }
 
-    public Path absolutePath(FileTemplate file, Path path) {
-        if (path.getNameCount() == 1)
-            return file.getPath().resolve(path);
-
-        return path;
-    }
-
     public WorkProject toProject() {
         WorkProject project = new WorkProject();
         topologicalSort(files).forEach(f -> project.put(f.toFile(project), f.getPath()));
@@ -93,7 +86,11 @@ public class ProjectTemplate {
             indexMap.put(files.get(i).getPath(), i);
 
         List<Set<Integer>> graph = files.stream()
-                .map(f -> f.getDependencies(this).map(Path::getParent).map(indexMap::get).collect(Collectors.toSet()))
+                .map(f -> f.getDependencies().map(Path::getParent).map(p -> {
+                    if (!indexMap.containsKey(p))
+                        throw new IllegalStateException("Unknown file " + p);
+                    return indexMap.get(p);
+                }).collect(Collectors.toSet()))
                 .collect(Collectors.toCollection(ArrayList::new));
 
         List<Set<Integer>> graphInverse = new ArrayList<>(graph.size());

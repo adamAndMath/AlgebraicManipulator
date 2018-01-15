@@ -23,7 +23,7 @@ public class CallTemplate implements ManipulationTemplate {
     }
 
     @Override
-    public Stream<Path> getDependencies(ProjectTemplate project, FileTemplate file) {
+    public Stream<Path> getDependencies(FileTemplate file) {
         return Stream.empty();
     }
 

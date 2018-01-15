@@ -46,8 +46,8 @@ public class Substitution implements Manipulation {
     }
 
     @Override
-    public Stream<Path> getDependencies(WorkProject project, WorkFile file) {
-        return Stream.of(project.absolutePath(file, workPath));
+    public Stream<Path> getDependencies(WorkFile file) {
+        return Stream.of(file.absolutePath(workPath));
     }
 
     @Override

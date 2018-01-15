@@ -49,8 +49,8 @@ public class WorkTemplate extends EquationTemplate {
     }
 
     @Override
-    public Stream<Path> getDependencies(ProjectTemplate project, FileTemplate file) {
-        return manipulations.stream().flatMap(m -> m.getDependencies(project, file));
+    public Stream<Path> getDependencies(FileTemplate file) {
+        return manipulations.stream().flatMap(m -> m.getDependencies(file));
     }
 
     @Override

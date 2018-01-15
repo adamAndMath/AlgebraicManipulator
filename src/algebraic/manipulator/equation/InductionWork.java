@@ -82,9 +82,9 @@ public class InductionWork extends Equation {
     }
 
     @Override
-    public Stream<Path> getDependencies(WorkProject project, WorkFile file) {
+    public Stream<Path> getDependencies(WorkFile file) {
         return Stream.concat(Stream.of(base), Stream.of(up, down).flatMap(Arrays::stream))
-                .flatMap(e -> e.getDependencies(project, file));
+                .flatMap(e -> e.getDependencies(file));
     }
 
     public int indexOf(String var) {

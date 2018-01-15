@@ -10,6 +10,6 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public interface Manipulation {
-    Stream<Path> getDependencies(WorkProject project, WorkFile file);
+    Stream<Path> getDependencies(WorkFile file);
     Statement apply(WorkProject project, WorkFile file, int i, Statement statement);
 }

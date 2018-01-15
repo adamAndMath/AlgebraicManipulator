@@ -41,8 +41,8 @@ public class SubstitutionTemplate implements ManipulationTemplate {
     }
 
     @Override
-    public Stream<Path> getDependencies(ProjectTemplate project, FileTemplate file) {
-        return Stream.of(project.absolutePath(file, path));
+    public Stream<Path> getDependencies(FileTemplate file) {
+        return Stream.of(file.absolutePath(path));
     }
 
     @Override

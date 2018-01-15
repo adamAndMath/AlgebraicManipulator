@@ -308,7 +308,7 @@ public class LatexWriter {
     }
 
     public static void writeSubstitution(PrintStream writer, WorkProject project, WorkFile file, Substitution substitution) {
-        Path workPath = project.absolutePath(file, substitution.getWorkPath());
+        Path workPath = file.absolutePath(substitution.getWorkPath());
         Equation work = substitution.getWork(project, file);
         List<String> variables = work.streamVariables().map(Definition::getName).collect(toList());
 

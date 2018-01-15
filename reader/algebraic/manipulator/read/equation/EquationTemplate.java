@@ -5,7 +5,6 @@ import algebraic.manipulator.WorkFile;
 import algebraic.manipulator.WorkProject;
 import algebraic.manipulator.equation.Equation;
 import algebraic.manipulator.read.FileTemplate;
-import algebraic.manipulator.read.ProjectTemplate;
 import algebraic.manipulator.statement.Statement;
 
 import java.nio.file.Path;
@@ -17,7 +16,7 @@ public abstract class EquationTemplate {
     public List<Definition> parameters = new ArrayList<>();
     public List<Statement> result;
 
-    public Stream<Path> getDependencies(ProjectTemplate project, FileTemplate file) {
+    public Stream<Path> getDependencies(FileTemplate file) {
         return Stream.empty();
     }
 

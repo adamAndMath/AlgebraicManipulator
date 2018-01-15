@@ -2,7 +2,6 @@ package algebraic.manipulator.read.equation;
 
 import algebraic.manipulator.WorkFile;
 import algebraic.manipulator.WorkProject;
-import algebraic.manipulator.equation.AssumedWork;
 import algebraic.manipulator.equation.Equation;
 import algebraic.manipulator.equation.InductionWork;
 import algebraic.manipulator.read.*;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.joining;
@@ -97,10 +95,10 @@ public class InductionTemplate extends EquationTemplate {
     }
 
     @Override
-    public Stream<Path> getDependencies(ProjectTemplate project, FileTemplate file) {
+    public Stream<Path> getDependencies(FileTemplate file) {
         return Stream.concat(
-                base.getDependencies(project, file),
-                Stream.concat(up.stream(), down.stream()).flatMap(List::stream).flatMap(m -> m.getDependencies(project, file))
+                base.getDependencies(file),
+                Stream.concat(up.stream(), down.stream()).flatMap(List::stream).flatMap(m -> m.getDependencies(file))
         );
     }
 
