@@ -27,6 +27,10 @@ public class AssumedWork extends Equation {
         return origin.clone();
     }
 
+    public Statement[] getCurrent() {
+        return current.clone();
+    }
+
     public List<Manipulation> getManipulations() {
         return Collections.unmodifiableList(manipulations);
     }

@@ -8,7 +8,6 @@ import algebraic.manipulator.statement.Statement;
 
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class Work extends Equation {
@@ -43,11 +42,11 @@ public class Work extends Equation {
     }
 
     public Statement getOrigin() {
-        return origin;
+        return origin.clone();
     }
 
-    public int getAmount() {
-        return amount;
+    public Statement[] getCurrent() {
+        return current.clone();
     }
 
     public List<Manipulation> getManipulations() {

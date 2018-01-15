@@ -10,9 +10,11 @@ import algebraic.manipulator.statement.Statement;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.*;
 
 public class WorkTemplate extends EquationTemplate {
     public Statement origin;
@@ -63,8 +65,12 @@ public class WorkTemplate extends EquationTemplate {
             }
         }
 
-        if (!work.validate())
-            throw new IllegalStateException("Result should be " + result.stream().map(Object::toString).collect(Collectors.joining("=")));
+        if (!work.validate()) {
+            throw new IllegalStateException("Result should be "
+                    + result.stream().map(Object::toString).collect(joining("="))
+                    + " not " + Arrays.stream(work.getCurrent()).map(Object::toString).collect(joining("="))
+            );
+        }
 
         return work;
     }

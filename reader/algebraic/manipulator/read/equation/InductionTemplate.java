@@ -2,6 +2,7 @@ package algebraic.manipulator.read.equation;
 
 import algebraic.manipulator.WorkFile;
 import algebraic.manipulator.WorkProject;
+import algebraic.manipulator.equation.AssumedWork;
 import algebraic.manipulator.equation.Equation;
 import algebraic.manipulator.equation.InductionWork;
 import algebraic.manipulator.read.*;
@@ -12,11 +13,13 @@ import algebraic.manipulator.statement.Variable;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 public class InductionTemplate extends EquationTemplate {
@@ -130,8 +133,25 @@ public class InductionTemplate extends EquationTemplate {
             }
         }
 
-        if (!induction.validate())
-            throw new IllegalStateException("Result should be " + result.stream().map(Object::toString).collect(Collectors.joining("=")));
+        if (!induction.validate()) {
+            for (String ind : induction.getInductive()) {
+                if (!induction.getUp(ind).validate()) {
+                    throw new IllegalStateException("Result of " + ind + "+1 should be "
+                            + result.stream().map(Object::toString).collect(joining("="))
+                            + " not " + Arrays.stream(induction.getUp(ind).getCurrent()).map(Object::toString).collect(joining("="))
+                    );
+                }
+
+                if (!induction.getDown(ind).validate()) {
+                    throw new IllegalStateException("Result of " + ind + "-1 should be "
+                            + result.stream().map(Object::toString).collect(joining("="))
+                            + " not " + Arrays.stream(induction.getDown(ind).getCurrent()).map(Object::toString).collect(joining("="))
+                    );
+                }
+            }
+
+            throw new IllegalStateException("Invalid induction");
+        }
 
         return induction;
     }
