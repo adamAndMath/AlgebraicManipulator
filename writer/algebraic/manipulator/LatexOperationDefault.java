@@ -135,7 +135,7 @@ public class LatexOperationDefault {
         writer.print("\\right)");
     }
 
-    public static void func(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
+    private static void func(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
         writer.print("\\underset{");
         LatexWriter.writeList(writer, IntStream.range(0, operation.dummyCount()).mapToObj(operation::getDummy).collect(toList()), ",", PrintStream::print);
 
@@ -152,13 +152,13 @@ public class LatexOperationDefault {
         writer.print("\\right)");
     }
 
-    public static void lim(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
-        if (operation.dummyCount() == 1 || operation.parameterCount() == 2) {
+    private static void lim(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
+        if (operation.dummyCount() != 1 || operation.parameterCount() != 2) {
             LatexWriter.defaultWriter(writer, operation, textColor, backColor);
             return;
         }
 
-        writer.print("\\lim_{");
+        writer.print("\\displaystyle\\lim_{");
         writer.print(operation.getDummy(0));
         writer.print("\\to ");
         LatexWriter.writeStatement(writer, operation.getParameter(0), textColor.subOrEmpty(0), backColor.subOrEmpty(0));
@@ -167,8 +167,8 @@ public class LatexOperationDefault {
         LatexWriter.writeStatement(writer, operation.getParameter(1), textColor.subOrEmpty(1), backColor.subOrEmpty(1), Integer.MAX_VALUE);
     }
 
-    public static void diff(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
-        if (operation.dummyCount() == 0 || operation.parameterCount() == 2) {
+    private static void diff(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
+        if (operation.dummyCount() != 0 || operation.parameterCount() != 2) {
             LatexWriter.defaultWriter(writer, operation, textColor, backColor);
             return;
         }
