@@ -15,6 +15,7 @@ public class LatexOperationDefault {
         LatexWriter.operationWriters.put("sub", getBiOperationWriter(" - ", 1));
         LatexWriter.operationWriters.put("mult", getBiOperationWriter(" \\cdot ", 2));
         LatexWriter.operationWriters.put("div", LatexOperationDefault::div);
+        LatexWriter.operationWriters.put("pow", LatexOperationDefault::pow);
         LatexWriter.operationWriters.put("rec", LatexOperationDefault::rec);
         LatexWriter.operationWriters.put("sum", LatexOperationDefault::sum);
         LatexWriter.operationWriters.put("prod", LatexOperationDefault::prod);
@@ -56,6 +57,20 @@ public class LatexOperationDefault {
         writer.print("\\frac{");
         LatexWriter.writeStatement(writer, operation.getParameter(0), textColor.subOrEmpty(0), backColor.subOrEmpty(0));
         writer.print("}{");
+        LatexWriter.writeStatement(writer, operation.getParameter(1), textColor.subOrEmpty(1), backColor.subOrEmpty(1));
+        writer.print("}");
+    }
+
+    private static void pow(PrintStream writer, Operation operation, PathTree<String> textColor, PathTree<String> backColor, int binding) {
+        if (operation.dummyCount() != 0 || operation.parameterCount() != 2) {
+            LatexWriter.defaultWriter(writer, operation, textColor, backColor);
+            return;
+        }
+
+        if (operation.getParameter(0) instanceof Operation) writer.print("\\left(");
+        LatexWriter.writeStatement(writer, operation.getParameter(0), textColor.subOrEmpty(0), backColor.subOrEmpty(0), 2);
+        if (operation.getParameter(0) instanceof Operation) writer.print("\\right)");
+        writer.print("^{");
         LatexWriter.writeStatement(writer, operation.getParameter(1), textColor.subOrEmpty(1), backColor.subOrEmpty(1));
         writer.print("}");
     }

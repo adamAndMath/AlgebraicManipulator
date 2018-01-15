@@ -6,6 +6,8 @@ import algebraic.manipulator.equation.Equation;
 import algebraic.manipulator.equation.InductionWork;
 import algebraic.manipulator.read.*;
 import algebraic.manipulator.read.manipulation.ManipulationTemplate;
+import algebraic.manipulator.statement.IntValue;
+import algebraic.manipulator.statement.Operation;
 import algebraic.manipulator.statement.Statement;
 import algebraic.manipulator.statement.Variable;
 
@@ -135,14 +137,16 @@ public class InductionTemplate extends EquationTemplate {
             for (String ind : induction.getInductive()) {
                 if (!induction.getUp(ind).validate()) {
                     throw new IllegalStateException("Result of " + ind + "+1 should be "
-                            + result.stream().map(Object::toString).collect(joining("="))
+                            + result.stream().map(s -> s.set(v -> ind.equals(v.getName()) ? new Operation("add", new Variable(ind), new IntValue(1)) : v.clone()))
+                                .map(Object::toString).collect(joining("="))
                             + " not " + Arrays.stream(induction.getUp(ind).getCurrent()).map(Object::toString).collect(joining("="))
                     );
                 }
 
                 if (!induction.getDown(ind).validate()) {
                     throw new IllegalStateException("Result of " + ind + "-1 should be "
-                            + result.stream().map(Object::toString).collect(joining("="))
+                            + result.stream().map(s -> s.set(v -> ind.equals(v.getName()) ? new Operation("sub", new Variable(ind), new IntValue(1)) : v.clone()))
+                                .map(Object::toString).collect(joining("="))
                             + " not " + Arrays.stream(induction.getDown(ind).getCurrent()).map(Object::toString).collect(joining("="))
                     );
                 }

@@ -53,6 +53,10 @@ public class Substitution implements Manipulation {
     @Override
     public Statement apply(WorkProject project, WorkFile file, int i, Statement statement) {
         Equation work = getWork(project, file);
+
+        if (values.size() != work.variableNames().size())
+            throw new IllegalStateException("Parameter count does't match referred work");
+
         Statement fromStatement = work.getStatement(from).set(v -> set(work, v));
         Statement toStatement = work.getStatement(to).set(v -> set(work, v));
 
