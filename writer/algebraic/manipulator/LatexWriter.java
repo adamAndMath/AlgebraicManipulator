@@ -37,7 +37,7 @@ public class LatexWriter {
     public static void writeProject(PrintStream writer, WorkProject project) {
         for (WorkFile file : project.sorted()) {
             writer.print("\\chapter{");
-            writeList(writer, file.getPath(), ":", PrintStream::print);
+            writer.print(file.getPath().getFileName());
             writer.println("}\n");
             writeFile(writer, project, file);
         }
