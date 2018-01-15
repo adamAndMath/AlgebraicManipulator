@@ -10,7 +10,7 @@ public class WorkFile {
     private final Path path;
     private final List<String> names = new ArrayList<>();
     private final Map<String, Equation> equations = new HashMap<>();
-    private final Map<String, Path> imports = new HashMap<>();
+    private final Map<String, Path> using = new HashMap<>();
 
     public WorkFile(Path path) {
         this.path = path;
@@ -47,10 +47,10 @@ public class WorkFile {
         return path;
     }
 
-    public void importFile(String key, Path path) {
-        if (imports.containsKey(key))
+    public void usingFile(String key, Path path) {
+        if (using.containsKey(key))
             throw new IllegalArgumentException(key + " is already imported");
-        imports.put(key, path);
+        using.put(key, path);
     }
 
     public Path absolutePath(Path path) {
@@ -58,8 +58,8 @@ public class WorkFile {
             case 1:
                 return getPath().resolve(path);
             case 2:
-                if (imports.containsKey(path.getName(0).toString()))
-                    return imports.get(path.getName(0).toString()).resolve(path.getFileName());
+                if (using.containsKey(path.getName(0).toString()))
+                    return using.get(path.getName(0).toString()).resolve(path.getFileName());
                 return getPath().getParent().resolve(path);
             default:
                 return path;

@@ -4,7 +4,7 @@ assume Div(Complex a)
 assume Resolve(Complex a, Func<Complex,Complex> f)
     lim<x>(a,eval(f,x))=eval(f,x);
 
-assume Func(Complex a,Func<Complex,Complex> f,Func<List<Complex,Complex>,Complex> g)
+assume Func(Complex a,Func<Complex,Complex> f,Func<Complex,Complex> g)
     lim<x>(a,eval(f,eval(g(x))))=eval(f,lim<x>(a,eval(g,x)))=lim<x>(eval(g,a),eval(f,x));
 
 assume Reciprocal(Complex a)

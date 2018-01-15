@@ -15,7 +15,7 @@ public class FileTemplate {
     private final Path path;
     private final List<String> names = new ArrayList<>();
     private final Map<String, EquationTemplate> equations = new HashMap<>();
-    private final Map<String, Path> imports = new HashMap<>();
+    private final Map<String, Path> usings = new HashMap<>();
 
     public FileTemplate(Path path) {
         this.path = path;
@@ -31,7 +31,7 @@ public class FileTemplate {
 
     public WorkFile toFile(WorkProject project) {
         WorkFile file = new WorkFile(path);
-        imports.forEach(file::importFile);
+        usings.forEach(file::usingFile);
 
         for (String name : names) {
             try {
@@ -49,10 +49,10 @@ public class FileTemplate {
          equations.put(name, equation);
     }
 
-    public void importFile(String key, Path path) {
-        if (imports.containsKey(key))
+    public void usingFile(String key, Path path) {
+        if (usings.containsKey(key))
             throw new IllegalArgumentException(key + " is already imported");
-        imports.put(key, path);
+        usings.put(key, path);
     }
 
     public Path absolutePath(Path path) {
@@ -60,8 +60,8 @@ public class FileTemplate {
             case 1:
                 return getPath().resolve(path);
             case 2:
-                if (imports.containsKey(path.getName(0).toString()))
-                    return imports.get(path.getName(0).toString()).resolve(path.getFileName());
+                if (usings.containsKey(path.getName(0).toString()))
+                    return usings.get(path.getName(0).toString()).resolve(path.getFileName());
                 return getPath().getParent().resolve(path);
             default:
                 return path;

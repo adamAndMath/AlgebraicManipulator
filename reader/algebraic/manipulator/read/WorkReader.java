@@ -127,7 +127,7 @@ public class WorkReader {
         return manipulation;
     }
 
-    public static void readImport(TokenReader reader, FileTemplate file) throws IOException {
+    public static void readUsing(TokenReader reader, FileTemplate file) throws IOException {
         Path path = reader.readReduce(Token.DOT, r -> Paths.get(r.readString()), (r, p) -> p.resolve(r.readString()));
         String key = path.getFileName().toString();
 
@@ -136,7 +136,7 @@ public class WorkReader {
             reader.assertIgnore(Token.SEMI);
         }
 
-        file.importFile(key, path);
+        file.usingFile(key, path);
     }
 
     public static FileTemplate readFile(TokenReader reader, Path path) throws IOException {
@@ -145,8 +145,8 @@ public class WorkReader {
         while (!reader.isCurrent(Token.EOF)) {
             String keyWork = reader.readString();
 
-            if ("import".equals(keyWork)) {
-                readImport(reader, file);
+            if ("using".equals(keyWork)) {
+                readUsing(reader, file);
                 continue;
             }
 
