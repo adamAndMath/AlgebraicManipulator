@@ -3,6 +3,8 @@ package algebraic.manipulator;
 import algebraic.manipulator.read.ProjectTemplate;
 
 import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class Main {
@@ -22,6 +24,9 @@ public class Main {
 
         ProjectTemplate template = new ProjectTemplate(Paths.get(args[0]));
         WorkProject project = template.toProject();
-        LatexWriter.writeProject(System.out, project);
+
+        PrintStream file = new PrintStream(Files.newOutputStream(Paths.get(args[1])));
+        LatexWriter.writeProject(file, project, args[2], args[3]);
+        file.close();
     }
 }

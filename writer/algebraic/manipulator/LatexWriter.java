@@ -12,6 +12,8 @@ import algebraic.manipulator.type.Type;
 
 import java.io.PrintStream;
 import java.nio.file.Path;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.stream.IntStream;
@@ -34,13 +36,36 @@ public class LatexWriter {
         return tree;
     }
 
-    public static void writeProject(PrintStream writer, WorkProject project) {
+    public static void writeProject(PrintStream writer, WorkProject project, String title, String author) {
+        LocalDate date = LocalDate.now();
+
+        writer.println("\\documentclass{report}");
+        writer.println("\\usepackage[utf8]{inputenc}");
+        writer.println("\\usepackage{hyperref}");
+        writer.println("\\usepackage{amssymb}");
+        writer.println("\\usepackage{amsmath}");
+        writer.println("\\usepackage{xcolor}");
+        writer.println();
+        writer.println("\\title{" + title + "}");
+        writer.println("\\author{" + author + "}");
+        writer.println("\\date{" + date.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH) + " " + date.getYear() + "}");
+        writer.println();
+        writer.println();
+        writer.println("\\begin{document}");
+        writer.println();
+        writer.println("\\maketitle");
+        writer.println("\\tableofcontents");
+        writer.println();
+
         for (WorkFile file : project.sorted()) {
             writer.print("\\chapter{");
             writer.print(file.getPath().getFileName());
             writer.println("}\n");
             writeFile(writer, project, file);
         }
+
+        writer.println();
+        writer.println("\\end{document}");
     }
 
     public static void writeFile(PrintStream writer, WorkProject project, WorkFile file) {
