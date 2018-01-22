@@ -22,15 +22,17 @@ public class ToEvalTemplate implements ManipulationTemplate {
             variable = reader.readString();
             reader.assertIgnore(Token.EQUAL);
             statement = WorkReader.readStatement(reader);
-            reader.assertIgnore(Token.COLON);
+            if (reader.isRead(Token.COLON)) {
+                reader.assertIgnore(Token.LSQR);
 
-            reader.assertIgnore(Token.LSQR);
+                positions = reader.isCurrent(Token.RSQR)
+                        ? new ArrayList<>()
+                        : reader.readList(Token.VBAR, r -> r.readList(Token.COMMA, TokenReader::readInt));
 
-            positions = reader.isCurrent(Token.RSQR)
-                    ? new ArrayList<>()
-                    : reader.readList(Token.VBAR, r -> r.readList(Token.COMMA, TokenReader::readInt));
-
-            reader.assertIgnore(Token.RSQR);
+                reader.assertIgnore(Token.RSQR);
+            } else {
+                positions = List.of();
+            }
         }
 
         public ToEval.Parameter toParameter() {
