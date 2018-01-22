@@ -20,8 +20,9 @@ public class ToEvalTemplate implements ManipulationTemplate {
 
         public Parameter(TokenReader reader) throws IOException {
             variable = reader.readString();
-            reader.assertIgnore(Token.EQUAL);
-            statement = WorkReader.readStatement(reader);
+            if (reader.isRead(Token.EQUAL))
+                statement = WorkReader.readStatement(reader);
+
             if (reader.isRead(Token.COLON)) {
                 reader.assertIgnore(Token.LSQR);
 

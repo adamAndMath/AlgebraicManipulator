@@ -10,7 +10,7 @@ assume Prod<i,r>(Func<List<Integer,Complex>,Complex> f, Integer a, Integer b)
 work Identity<i>(Func<Integer,Complex> f, Integer a) {
     let 2 prod<i>(eval(f,i),a,sub(a,1));
     substitute Prod[0->1]<i,r>:1;
-    toeval(j=i:[1,1,0,0],q=r:[0]):1,0;
+    toeval(j:[1,1,0,0],q=r:[0]):1,0;
     substitute Sub.Commute2[2->0]:1,2;
     substitute Sub.Add1[2->0]:1,2,0;
     substitute Sub.Inverse[0->1]:1,2;
@@ -22,7 +22,7 @@ work Identity<i>(Func<Integer,Complex> f, Integer a) {
 work Rec<i>(Func<Integer,Complex> f, Integer a, Integer b) {
     let 2 prod<i>(eval(f,i),a,b);
     substitute Prod[0->1]<i,r>:1;
-    toeval(i1=i:[1,1,0,0],r1=r:[0]):1,0;
+    toeval(j:[1,1,0,0],r1=r:[0]):1,0;
     substitute Rec.Rec[0->1]<i,r>:1;
     fromeval:1,2,0;
     fromeval:1;
@@ -78,7 +78,7 @@ work IndexShift<i>(Func<Integer,Complex> f, Integer a, Integer b, Integer c) {
     substitute Sub.Add1[0->1](-,c):1,2,0,0;
     substitute Sub.Commute[1->2]:1,2,0;
     substitute Sub.Add1[0->1](-,c):1,0,1,1;
-    toeval(i1=add(sub(add(i,a),1),c):[1,0]):1,0,1;
+    toeval(j:[1,0]):1,0,1;
     substitute Sub.Commute2[2->0]:1,0,1,1;
     substitute Add.Associate[0->1]:1,0,1,1,0;
     substitute Prod[1->0]<i,r>:1;
@@ -90,18 +90,16 @@ work IndexShift<i>(Func<Integer,Complex> f, Integer a, Integer b, Integer c) {
 induction Reverse<i>(Func<Integer,Complex> f, Integer a, Integer b) {
     base a=0,b=0 {
         let 2 prod<i>(eval(f,i),0,0);
-        substitute Rec[0->1]<i>:1;
-        substitute Identity[0->1]<i>:1,0;
+        substitute Single[0->1]<i>:1;
+        substitute Sub.Inverse[1->0](0):1,1;
         substitute Sub.Inverse[1->0](0):1,1,1;
-        substitute Sub.Inverse[1->0](0):1,1,1,1;
-        toeval(i1=sub(0,0):[1,1]):1,1;
-        substitute Identity[1->0]<i>(func<i1>(eval(f,sub(0,i1))),sub(0,0)):1,0;
-        substitute Rec[1->0]<i>:1;
+        toeval(j:[1,1]):1;
+        substitute Single[1->0]<i>:1;
         fromeval:1,0;
     } a+ {
         substitute Rec2[0->1]<i>:0;
         substitute Mult.Commute[0->1]:0;
-        toeval(i1=i:[1,1]):1,0;
+        toeval(j:[1,1]):1,0;
         substitute Rec[0->1]<i>:1;
         fromeval:1,0,0;
         fromeval:1,1;
@@ -118,8 +116,8 @@ induction Reverse<i>(Func<Integer,Complex> f, Integer a, Integer b) {
         substitute Mult.Commute[0->1]:0;
         substitute Rec2[1->0]<i>:0;
         substitute Sub.Negate[0->1]:1,1,1;
-        toeval(i1=i:[1,1]):1,0,0;
-        toeval(i1=sub(0,sub(a,1)):[1,1]):1,1;
+        toeval(j:[1,1]):1,0,0;
+        toeval(j:[1,1]):1,1;
         substitute Rec[1->0]<i>:1;
         fromeval:1,0;
     } b+ {
@@ -130,13 +128,13 @@ induction Reverse<i>(Func<Integer,Complex> f, Integer a, Integer b) {
         substitute Mult.Commute[0->1]:1;
         substitute Rec[1->0]<i>:0;
         substitute Sub.Negate[0->1]:1,0,1;
-        toeval(i1=i:[1,1]):1,1,0;
-        toeval(i1=sub(0,add(b,1)):[1,1]):1,0;
+        toeval(j:[1,1]):1,1,0;
+        toeval(j:[1,1]):1,0;
         substitute Rec2[1->0]<i>:1;
         fromeval:1,0;
     } b- {
         substitute Rec[0->1]<i>:0;
-        toeval(i1=i:[1,1]):1,0;
+        toeval(j:[1,1]):1,0;
         substitute Rec2[0->1]<i>:1;
         fromeval:1,0;
         fromeval:1,1,0;
@@ -179,7 +177,7 @@ induction RangeSplit<i,j>(Func<Integer,Complex> f, Integer a, Integer b, Integer
 induction Distribute<i,j>(Func<Integer,Complex> f, Func<Integer,Complex> g, Integer a, Integer b) {
     base b=a {
         let 2 mult(eval(f,a),eval(g,a));
-        toeval(k=a:[0,1|1,1]):0;
+        toeval(k:[0,1|1,1]):0;
         substitute Single[1->0]<i>:0;
         fromeval:0,0;
         substitute Single[1->0]<i>:1,0;
@@ -193,8 +191,8 @@ induction Distribute<i,j>(Func<Integer,Complex> f, Func<Integer,Complex> g, Inte
         substitute Mult.Associate[1->0]:1,0;
         substitute Mult.Associate[0->1]:1;
 
-        toeval(i1=i:[0,1|1,1]):0,0,0;
-        toeval(i1=add(b,1):[0,1|1,1]):0,1;
+        toeval(k:[0,1|1,1]):0,0,0;
+        toeval(k:[0,1|1,1]):0,1;
 
         substitute Sub.Add1[0->1](-,1):0,0,2;
         substitute Sub.Add1[0->1](-,1):1,0,0,2;
@@ -206,7 +204,7 @@ induction Distribute<i,j>(Func<Integer,Complex> f, Func<Integer,Complex> g, Inte
 
         fromeval:0,0;
     } b- {
-        toeval(k=i:[0,1|1,1]):0,0;
+        toeval(k:[0,1|1,1]):0,0;
 
         substitute Rec[0->1]<i>:0;
         substitute Rec[0->1]<i>:1,0;
@@ -233,49 +231,49 @@ induction Distribute<i,j>(Func<Integer,Complex> f, Func<Integer,Complex> g, Inte
 induction Commute<i,j>(Func<List<Integer,Integer>,Complex> f, Integer a1, Integer b1, Integer a2, Integer b2) {
     base b1=a1, b2=a2 {
         let 2 eval(f,a1,a2);
-        toeval(a=a1:[1]):0;
+        toeval(a:[1]):0;
         substitute Single[1->0]<i>:0;
         fromeval:0,0;
-        toeval(a=a2:[2]):0,0;
+        toeval(a:[2]):0,0;
         substitute Single[1->0]<j>:0,0;
         fromeval:0,0,0;
 
-        toeval(a=a2:[2]):1;
+        toeval(a:[2]):1;
         substitute Single[1->0]<j>:1;
         fromeval:1,0;
-        toeval(a=a1:[1]):1,0;
+        toeval(a:[1]):1,0;
         substitute Single[1->0]<i>:1,0;
         fromeval:1,0,0;
     } b1+ {
         call x mult(x,prod<j>(eval(f,add(b1,1),j),a2,b2));
-        toeval(k=i:[0,1]):0,0,0;
-        toeval(k=add(b1,1):[0,1]):0,1;
+        toeval(k:[0,1]):0,0,0;
+        toeval(k:[0,1]):0,1;
         substitute Sub.Add1[0->1](-,1):0,0,2;
         substitute Rec[1->0]<i>:0;
         fromeval:0,0;
 
-        toeval(k=j:[0,2]):1,0,0;
-        toeval(k=j:[2]):1,1,0;
+        toeval(k:[0,2]):1,0,0;
+        toeval(k:[2]):1,1,0;
         substitute Distribute[1->0]<j,j>:1;
         fromeval:1,0,0;
         fromeval:1,0,1;
-        toeval(i1=i:[1]):1,0,0,0;
-        toeval(i1=add(b1,1):[1]):1,0,1;
+        toeval(k:[1]):1,0,0,0;
+        toeval(k:[1]):1,0,1;
         substitute Sub.Add1[0->1](b1,1):1,0,0,2;
         substitute Rec[1->0]<i>:1,0;
         fromeval:1,0,0;
     } b1- {
-        toeval(k=i:[0,1]):0,0;
+        toeval(k:[0,1]):0,0;
         substitute Rec[0->1]<i>:0;
         fromeval:0,0,0;
         fromeval:0,1;
 
-        toeval(k=i:[1]):1,0,0;
+        toeval(k:[1]):1,0,0;
         substitute Rec[0->1]<i>:1,0;
         fromeval:1,0,0,0;
         fromeval:1,0,1;
-        toeval(k=j:[0,2]):1,0,0;
-        toeval(k=j:[2]):1,0,1;
+        toeval(k:[0,2]):1,0,0;
+        toeval(k:[2]):1,0,1;
         substitute Distribute[0->1]<j,j>:1;
         fromeval:1,0,0;
         fromeval:1,1,0;
@@ -285,34 +283,34 @@ induction Commute<i,j>(Func<List<Integer,Integer>,Complex> f, Integer a1, Intege
         substitute Div.Mult1[1->0]:1;
     } b2+ {
         call x mult(x,prod<i>(eval(f,i,add(b2,1)),a1,b1));
-        toeval(k=j:[0,2]):1,0,0;
-        toeval(k=add(b2,1):[0,2]):1,1;
+        toeval(k:[0,2]):1,0,0;
+        toeval(k:[0,2]):1,1;
         substitute Sub.Add1[0->1](-,1):1,0,2;
         substitute Rec[1->0]<j>:1;
         fromeval:1,0;
 
-        toeval(k=i:[0,1]):0,0,0;
-        toeval(k=i:[1]):0,1,0;
+        toeval(k:[0,1]):0,0,0;
+        toeval(k:[1]):0,1,0;
         substitute Distribute[1->0]<i,i>:0;
         fromeval:0,0,0;
         fromeval:0,0,1;
-        toeval(k=j:[2]):0,0,0,0;
-        toeval(k=add(b2,1):[2]):0,0,1;
+        toeval(k:[2]):0,0,0,0;
+        toeval(k:[2]):0,0,1;
         substitute Sub.Add1[0->1](-,1):0,0,0,2;
         substitute Rec[1->0]<j>:0,0;
         fromeval:0,0,0;
     } b2- {
-        toeval(k=j:[2]):0,0,0;
+        toeval(k:[2]):0,0,0;
         substitute Rec[0->1]<j>:0,0;
         fromeval:0,0,0,0;
         fromeval:0,0,1;
-        toeval(k=i:[0,1]):0,0,0;
-        toeval(k=i:[1]):0,0,1;
+        toeval(k:[0,1]):0,0,0;
+        toeval(k:[1]):0,0,1;
         substitute Distribute[0->1]<i,i>:0;
         fromeval:0,0,0;
         fromeval:0,1,0;
 
-        toeval(k=j:[0,2]):1,0;
+        toeval(k:[0,2]):1,0;
         substitute Rec[0->1]<j>:1;
         fromeval:1,0,0;
         fromeval:1,1;
@@ -328,67 +326,67 @@ induction Commute<i,j>(Func<List<Integer,Integer>,Complex> f, Integer a1, Intege
 induction TriangleCommute<i,j>(Func<List<Integer,Integer>,Complex> f, Integer a, Integer n) {
     base n=a {
         let 2 eval(f,a,a);
-        toeval(k=a:[2]):0;
+        toeval(k:[2]):0;
         substitute Single[1->0]<j>:0;
         fromeval:0,0;
-        toeval(k=a:[0,1|2]):0;
+        toeval(k:[0,1|2]):0;
         substitute Single[1->0]<i>:0;
         fromeval:0,0;
-        toeval(k=a:[1]):1;
+        toeval(k:[1]):1;
         substitute Single[1->0]<i>:1;
         fromeval:1,0;
-        toeval(k=a:[0,2|1]):1;
+        toeval(k:[0,2|1]):1;
         substitute Single[1->0]<j>:1;
         fromeval:1,0;
     } n+ {
         call x mult(x,prod<j>(eval(f,add(n,1),j),a,add(n,1)));
-        toeval(k=i:[0,1|2]):0,0,0;
-        toeval(k=add(n,1):[0,1|2]):0,1;
+        toeval(k:[0,1|2]):0,0,0;
+        toeval(k:[0,1|2]):0,1;
         substitute Sub.Add1[0->1](-,1):0,0,2;
         substitute Rec[1->0]<i>:0;
         fromeval:0,0;
-        toeval(k=j:[2]):1,1,0;
+        toeval(k:[2]):1,1,0;
         substitute Rec[0->1]<j>:1,1;
         substitute Sub.Add1[1->0]:1,1,0,2;
         fromeval:1,1,0,0;
         fromeval:1,1,1;
         substitute Mult.Associate[1->0]:1;
-        toeval(k=j:[0,2|1]):1,0,0,0;
-        toeval(k=j:[2]):1,0,1,0;
+        toeval(k:[0,2|1]):1,0,0,0;
+        toeval(k:[2]):1,0,1,0;
         substitute Distribute[1->0]<j,j>:1,0;
         fromeval:1,0,0,0;
         fromeval:1,0,0,1;
-        toeval(k=i:[1]):1,0,0,0,0;
-        toeval(k=add(n,1):[1]):1,0,0,1;
+        toeval(k:[1]):1,0,0,0,0;
+        toeval(k:[1]):1,0,0,1;
         substitute Sub.Add1[0->1](-,1):1,0,0,0,2;
         substitute Rec[1->0]<i>:1,0,0;
         fromeval:1,0,0,0;
-        toeval(k=add(n,1):[1]):1,1;
+        toeval(k:[1]):1,1;
         substitute Single[1->0]<i>:1,1;
         fromeval:1,1,0;
-        toeval(k=j:[0,2|1]):1,0,0;
-        toeval(k=add(n,1):[0,2|1]):1,1;
+        toeval(k:[0,2|1]):1,0,0;
+        toeval(k:[0,2|1]):1,1;
         substitute Sub.Add1[0->1](-,1):1,0,2;
         substitute Rec[1->0]<j>:1;
         fromeval:1,0;
     } n- {
-        toeval(k=i:[0,1|2]):0,0;
+        toeval(k:[0,1|2]):0,0;
         substitute Rec[0->1]<i>:0;
         fromeval:0,0,0;
         fromeval:0,1;
 
-        toeval(k=i:[1]):1,0,0;
+        toeval(k:[1]):1,0,0;
         substitute Rec[0->1]<i>:1,0;
         fromeval:1,0,0,0;
         fromeval:1,0,1;
-        toeval(k=j:[0,2|1]):1,0,0;
-        toeval(k=j:[2]):1,0,1;
+        toeval(k:[0,2|1]):1,0,0;
+        toeval(k:[2]):1,0,1;
         substitute Distribute[0->1]<j,j>:1;
         substitute Rec[0->1]<j>:1,0;
         fromeval:1,0,0,0;
         fromeval:1,0,1;
         fromeval:1,1,0;
-        toeval(k=i:[1]):1,0,1,0;
+        toeval(k:[1]):1,0,1,0;
         substitute Identity[0->1]<i>:1,0,1;
         substitute Mult.Identity[1->0]:1,0;
 

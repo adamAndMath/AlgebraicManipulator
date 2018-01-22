@@ -9,7 +9,9 @@ import algebraic.manipulator.statement.Variable;
 
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -41,12 +43,10 @@ public class ToEval implements Manipulation {
     private final int[] position;
     private final PathTree<Parameter> tree;
     private final String[] variables;
-    private final Statement[] statements;
 
     public ToEval(int[] position, Parameter... parameters) {
         this.position = position;
         variables = Arrays.stream(parameters).map(Parameter::getVariable).toArray(String[]::new);
-        statements = Arrays.stream(parameters).map(Parameter::getStatement).toArray(Statement[]::new);
         tree = new PathTree<>(Arrays.asList(parameters), Parameter::getPositions, Function.identity());
     }
 
@@ -73,16 +73,23 @@ public class ToEval implements Manipulation {
     }
 
     private Operation replace(Statement statement) {
+        Map<String, Statement> pars = new HashMap<>();
+
+        tree.stream().filter(par -> par.getStatement() != null).forEach(par -> pars.put(par.getVariable(), par.getStatement()));
+
         return new Operation("eval",
                 Stream.concat(
-                        Stream.of(new Operation("func", Arrays.stream(variables).map(Variable::new).toArray(Variable[]::new), statement.replace(tree, this::replace))),
-                        Arrays.stream(statements).map(Statement::clone)
+                        Stream.of(new Operation("func", Arrays.stream(variables).map(Variable::new).toArray(Variable[]::new), statement.replace(tree, (par, state) -> replace(pars, par, state)))),
+                        Arrays.stream(variables).map(pars::get).map(Statement::clone)
                 ).toArray(Statement[]::new)
         );
     }
 
-    private Statement replace(Parameter par, Statement state) {
-        if (!par.statement.equals(state))
+    private Statement replace(Map<String, Statement> pars, Parameter par, Statement state) {
+        if (!pars.containsKey(par.getVariable()))
+            pars.put(par.getVariable(), state);
+
+        if (!pars.get(par.getVariable()).equals(state))
             throw new IllegalStateException("Expected " + par.getStatement().toString() + ", but received " + state.toString());
 
         return new Variable(par.getVariable());

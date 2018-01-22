@@ -1,11 +1,9 @@
 package algebraic.manipulator;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PathTree<T> {
     private static class Tree<T> {
@@ -99,6 +97,10 @@ public class PathTree<T> {
     @Override
     public String toString() {
         return isLeaf() ? getLeaf().toString() : children.entrySet().stream().map(e -> e.getKey() + ": " + e.getValue()).collect(Collectors.joining(", ", "{", "}"));
+    }
+
+    public Stream<T> stream() {
+        return isLeaf() ? Stream.of(getLeaf()) : children.values().stream().filter(Objects::nonNull).flatMap(PathTree::stream);
     }
 
     private static<T,S> Tree<T> build(Collection<S> collection, Function<S, int[][]> pos, Function<S, T> leaf) {
