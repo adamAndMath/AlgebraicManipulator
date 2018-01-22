@@ -2,6 +2,7 @@ using base.Add;
 using base.Sub;
 using base.Mult;
 using base.Div;
+using base.Pow;
 
 assume Prod<i,r>(Func<List<Integer,Complex>,Complex> f, Integer a, Integer b)
     prod<i>(eval(f,i),a,b)=rec<i,r>(mult(r,eval(f,sub(add(i,a),1))),1,add(sub(b,a),1));
@@ -322,4 +323,79 @@ induction Commute<i,j>(Func<List<Integer,Integer>,Complex> f, Integer a1, Intege
     }
 } result {
     prod<i>(prod<j>(eval(f,i,j),a2,b2),a1,b1)=prod<j>(prod<i>(eval(f,i,j),a1,b1),a2,b2)
+}
+
+induction TriangleCommute<i,j>(Func<List<Integer,Integer>,Complex> f, Integer a, Integer n) {
+    base n=a {
+        let 2 eval(f,a,a);
+        toeval(k=a:[2]):0;
+        substitute Single[1->0]<j>(func<k>(eval(f,a,k)),a):0;
+        fromeval:0,0;
+        toeval(k=a:[0,1|2]):0;
+        substitute Single[1->0]<i>(func<k>(prod<j>(eval(f,k,j),a,k)),a):0;
+        fromeval:0,0;
+        toeval(k=a:[1]):1;
+        substitute Single[1->0]<i>(func<k>(eval(f,k,a)),a):1;
+        fromeval:1,0;
+        toeval(k=a:[0,2|1]):1;
+        substitute Single[1->0]<j>(func<k>(prod<i>(eval(f,i,k),k,a)),a):1;
+        fromeval:1,0;
+    } n+ {
+        call x mult(x,prod<j>(eval(f,add(n,1),j),a,add(n,1)));
+        toeval(k=i:[0,1|2]):0,0,0;
+        toeval(k=add(n,1):[0,1|2]):0,1;
+        substitute Sub.Add1[0->1](n,1):0,0,2;
+        substitute Rec[1->0]<i>(func<k>(prod<j>(eval(f,k,j),a,k)),a,add(n,1)):0;
+        fromeval:0,0;
+        toeval(k=j:[2]):1,1,0;
+        substitute Rec[0->1]<j>(func<k>(eval(f,add(n,1),k)),a,add(n,1)):1,1;
+        substitute Sub.Add1[1->0](n,1):1,1,0,2;
+        fromeval:1,1,0,0;
+        fromeval:1,1,1;
+        substitute Mult.Associate[1->0](prod<j>(prod<i>(eval(f,i,j),j,n),a,n),prod<j>(eval(f,add(n,1),j),a,n),eval(f,add(n,1),add(n,1))):1;
+        toeval(k=j:[0,2|1]):1,0,0,0;
+        toeval(k=j:[2]):1,0,1,0;
+        substitute Distribute[1->0]<j,j>(func<k>(prod<i>(eval(f,i,k),k,n)),func<k>(eval(f,add(n,1),k)),a,n):1,0;
+        fromeval:1,0,0,0;
+        fromeval:1,0,0,1;
+        toeval(k=i:[1]):1,0,0,0,0;
+        toeval(k=add(n,1):[1]):1,0,0,1;
+        substitute Sub.Add1[0->1](n,1):1,0,0,0,2;
+        substitute Rec[1->0]<i>(func<k>(eval(f,k,j)),j,add(n,1)):1,0,0;
+        fromeval:1,0,0,0;
+        toeval(k=add(n,1):[1]):1,1;
+        substitute Single[1->0]<i>(func<k>(eval(f,k,add(n,1))),add(n,1)):1,1;
+        fromeval:1,1,0;
+        toeval(k=j:[0,2|1]):1,0,0;
+        toeval(k=add(n,1):[0,2|1]):1,1;
+        substitute Sub.Add1[0->1](n,1):1,0,2;
+        substitute Rec[1->0]<j>(func<k>(prod<i>(eval(f,i,k),k,add(n,1))),a,add(n,1)):1;
+        fromeval:1,0;
+    } n- {
+        toeval(k=i:[0,1|2]):0,0;
+        substitute Rec[0->1]<i>(func<k>(prod<j>(eval(f,k,j),a,k)),a,n):0;
+        fromeval:0,0,0;
+        fromeval:0,1;
+
+        toeval(k=i:[1]):1,0,0;
+        substitute Rec[0->1]<i>(func<k>(eval(f,k,j)),j,n):1,0;
+        fromeval:1,0,0,0;
+        fromeval:1,0,1;
+        toeval(k=j:[0,2|1]):1,0,0;
+        toeval(k=j:[2]):1,0,1;
+        substitute Distribute[0->1]<j,j>(func<k>(prod<i>(eval(f,i,k),k,sub(n,1))),func<k>(eval(f,n,k)),a,n):1;
+        substitute Rec[0->1]<j>(func<k>(prod<i>(eval(f,i,k),k,sub(n,1))),a,n):1,0;
+        fromeval:1,0,0,0;
+        fromeval:1,0,1;
+        fromeval:1,1,0;
+        toeval(k=i:[1]):1,0,1,0;
+        substitute Identity[0->1]<i>(func<k>(eval(f,k,n)),n):1,0,1;
+        substitute Mult.Identity[1->0](prod<j>(prod<i>(eval(f,i,j),j,sub(n,1)),a,sub(n,1))):1,0;
+
+        call x div(x,prod<j>(eval(f,n,j),a,n));
+        substitute Div.Mult1[1->0](prod<i>(prod<j>(eval(f,i,j),a,i),a,sub(n,1)),prod<j>(eval(f,n,j),a,n)):0;
+        substitute Div.Mult1[1->0](prod<j>(prod<i>(eval(f,i,j),j,sub(n,1)),a,sub(n,1)),prod<j>(eval(f,n,j),a,n)):1;
+    }
+} result {
+    prod<i>(prod<j>(eval(f,i,j),a,i),a,n)=prod<j>(prod<i>(eval(f,i,j),j,n),a,n)
 }
