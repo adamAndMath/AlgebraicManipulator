@@ -136,7 +136,7 @@ public class LatexWriter {
         PathTree<String> textColor = new PathTree<>();
 
         for (Manipulation manipulation : work.getManipulations()) {
-            backColor = getInputColors(project, file, manipulation);
+            backColor = getInputColors(project, file, statements, manipulation);
 
             writer.print("$$");
 
@@ -156,7 +156,7 @@ public class LatexWriter {
             writeManipulation(writer, project, file, manipulation);
             writer.println("}");
 
-            textColor = getOutputColors(project, file, manipulation);
+            textColor = getOutputColors(project, file, statements, manipulation);
         }
 
         backColor = new PathTree<>();
@@ -210,7 +210,7 @@ public class LatexWriter {
         PathTree<String> textColor = new PathTree<>();
 
         for (Manipulation manipulation : work.getManipulations()) {
-            backColor = getInputColors(project, file, manipulation);
+            backColor = getInputColors(project, file, statements, manipulation);
 
             writer.print("$$");
 
@@ -230,7 +230,7 @@ public class LatexWriter {
             writeManipulation(writer, project, file, manipulation);
             writer.println("}");
 
-            textColor = getOutputColors(project, file, manipulation);
+            textColor = getOutputColors(project, file, statements, manipulation);
         }
 
         backColor = new PathTree<>();
@@ -246,7 +246,7 @@ public class LatexWriter {
         writer.println("$$");
     }
 
-    public static PathTree<String> getInputColors(WorkProject project, WorkFile file, Manipulation manipulation) {
+    public static PathTree<String> getInputColors(WorkProject project, WorkFile file, Statement[] current, Manipulation manipulation) {
         if (manipulation instanceof Call)
             return new PathTree<>();
 
@@ -275,10 +275,12 @@ public class LatexWriter {
         throw new IllegalStateException("Not implemented");
     }
 
-    public static PathTree<String> getOutputColors(WorkProject project, WorkFile file, Manipulation manipulation) {
+    public static PathTree<String> getOutputColors(WorkProject project, WorkFile file, Statement[] current, Manipulation manipulation) {
         if (manipulation instanceof Call) {
             Call call = (Call) manipulation;
-            return call.getCall().tree(var -> var.getName().equals(call.getTemp()) ? colors.get(0) : null);
+            PathTree<String> tree = call.getCall().tree(var -> var.getName().equals(call.getTemp()) ? colors.get(0) : null);
+
+            return new PathTree<>(IntStream.range(0, current.length).boxed().collect(toMap(i -> i, i -> tree)));
         }
 
         if (manipulation instanceof Substitution) {
