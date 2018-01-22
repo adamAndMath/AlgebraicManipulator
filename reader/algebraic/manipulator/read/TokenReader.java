@@ -4,9 +4,14 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 public class TokenReader {
+    private static final Predicate<String> isLetter = Pattern.compile("\\p{Alpha}").asPredicate();
+    private static final Predicate<String> isDigit = Pattern.compile("\\p{Digit}").asPredicate();
+
     private final Reader reader;
     private Token currentToken;
     private int c;
@@ -30,11 +35,11 @@ public class TokenReader {
     }
 
     private boolean letter(int c) {
-        return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+        return isLetter.test("" + (char) c);
     }
 
     private boolean digit(int c) {
-        return ('0' <= c && c <= '9');
+        return isDigit.test("" + (char) c);
     }
 
     private boolean alpha(int c) {
