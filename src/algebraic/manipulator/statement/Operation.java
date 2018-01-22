@@ -3,6 +3,7 @@ package algebraic.manipulator.statement;
 import algebraic.manipulator.PathTree;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -21,15 +22,19 @@ public class Operation extends Statement {
 
     public Operation(String name, Variable[] dummies, Statement... parameters) {
         this.name = name;
-        this.dummies = dummies;
-        this.parameters = parameters;
-        variables = Arrays.stream(parameters).map(Statement::getVariables).flatMap(Collection::stream).collect(Collectors.toSet());
-        Set<String> subDummies = Arrays.stream(parameters).map(Statement::getDummies).flatMap(Collection::stream).collect(Collectors.toCollection(HashSet::new));
+        this.dummies = dummies.clone();
+        this.parameters = parameters.clone();
         Set<String> dummySet = Arrays.stream(dummies).map(Variable::getName).collect(Collectors.toSet());
+        variables = Arrays.stream(parameters).map(Statement::getVariables).flatMap(Collection::stream).filter(v -> !dummySet.contains(v)).collect(Collectors.toSet());
+        Set<String> subDummies = Arrays.stream(parameters).map(Statement::getDummies).flatMap(Collection::stream).collect(Collectors.toCollection(HashSet::new));
 
         for (String s : dummySet)
             if (subDummies.contains(s))
                 throw new IllegalArgumentException("Redefined dummy " + s);
+
+        for (String s : subDummies)
+            if (variables.contains(s))
+                throw new IllegalArgumentException("Variable collision " + s);
 
         subDummies.addAll(dummySet);
         definedDummies = Collections.unmodifiableSet(subDummies);
@@ -86,6 +91,19 @@ public class Operation extends Statement {
                 Arrays.stream(dummies).map(Variable::clone).toArray(Variable[]::new),
                 Arrays.stream(parameters).map(Statement::clone).toArray(Statement[]::new)
         );
+    }
+
+    @Override
+    public <T> void get(PathTree<T> positions, BiConsumer<T, Statement> consumer) {
+        if (positions == null || positions.isEmpty())
+            return;
+
+        if (positions.isLeaf()) {
+            consumer.accept(positions.getLeaf(), this);
+        } else {
+            for (int i = 0; i < parameters.length; i++)
+                parameters[i].get(positions.sub(i), consumer);
+        }
     }
 
     @Override

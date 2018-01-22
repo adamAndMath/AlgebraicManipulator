@@ -3,6 +3,7 @@ package algebraic.manipulator.statement;
 import algebraic.manipulator.PathTree;
 
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -11,6 +12,15 @@ public abstract class Statement {
     public abstract Statement clone();
     public abstract Set<String> getVariables();
     public abstract Set<String> getDummies();
+
+    public<T> void get(PathTree<T> positions, BiConsumer<T, Statement> consumer) {
+        if (positions == null || positions.isEmpty()) return;
+
+        if (!positions.isLeaf())
+            throw new IllegalStateException("Illegal path");
+
+        consumer.accept(positions.getLeaf(), this);
+    }
 
     public Statement set(Function<Variable, Statement> function) {
         return clone();

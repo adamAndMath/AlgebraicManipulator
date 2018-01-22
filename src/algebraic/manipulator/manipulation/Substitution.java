@@ -1,5 +1,6 @@
 package algebraic.manipulator.manipulation;
 
+import algebraic.manipulator.PathTree;
 import algebraic.manipulator.WorkFile;
 import algebraic.manipulator.WorkProject;
 import algebraic.manipulator.equation.Equation;
@@ -7,7 +8,10 @@ import algebraic.manipulator.statement.Statement;
 import algebraic.manipulator.statement.Variable;
 
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public class Substitution implements Manipulation {
@@ -62,25 +66,43 @@ public class Substitution implements Manipulation {
         if (dummy.size() != work.dummies().size())
             throw new IllegalStateException("Dummy count does't match referred work");
 
-        Statement fromStatement = work.getStatement(from).setAll(v -> set(work, v));
-        Statement toStatement = work.getStatement(to).setAll(v -> set(work, v));
-
-        return statement.replace(position, 0, i, s -> replace(s, fromStatement, toStatement));
+        return statement.replace(position, 0, i, s -> replace(s, work));
     }
 
-    private Statement replace(Statement statement, Statement fromStatement, Statement toStatement) {
+    private Statement replace(Statement statement, Equation work) {
+        Statement fromStatement = work.getStatement(from);
+        Set<String> dummies = fromStatement.getDummies();
+
+        PathTree<String> tree = fromStatement.tree(v -> dummies.contains(v.getName()) ? null : v.getName());
+        Map<String, Statement> pars = new HashMap<>();
+
+        for (int i = 0; i < values.size(); i++)
+            if (values.get(i) != null)
+                pars.put(work.getVariable(i).getName(), values.get(i));
+
+        statement.get(tree, (v, s) -> {
+            if (!pars.containsKey(v))
+                pars.put(v, s);
+            else if (!pars.get(v).equals(s))
+                throw new IllegalStateException("Expected parameter " + pars.get(v) + ", but received " + s);
+        });
+
+        fromStatement = fromStatement.setAll(v -> set(work, pars, v));
+
         if (!fromStatement.equals(statement))
             throw new IllegalStateException("Expected " + fromStatement.toString() + ", but received " + statement.toString());
 
-        return toStatement.clone();
+        return work.getStatement(to).setAll(v -> set(work, pars, v));
     }
 
-    private Statement set(Equation work, Variable variable) {
+    private Statement set(Equation work, Map<String, Statement> parameters, Variable variable) {
         int index = work.dummies().indexOf(variable);
 
-        return index != -1 ? new Variable(dummy.get(index))
-                : work.containsVariable(variable.getName())
-                    ? values.get(work.indexOfVariable(variable.getName())).clone()
-                    : variable.clone();
+        if (index != -1)
+            return new Variable(dummy.get(index));
+        else if (parameters.containsKey(variable.getName()))
+            return parameters.get(variable.getName()).clone();
+        else
+            throw new IllegalStateException("Cannot infer " + variable);
     }
 }

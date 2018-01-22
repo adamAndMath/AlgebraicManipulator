@@ -64,8 +64,6 @@ public class Work extends Equation {
             if (variables.stream().anyMatch(current[i].getDummies()::contains))
                 throw new IllegalArgumentException("A variable and a dummy can not have the same name");
 
-            variables.addAll(current[i].getDummies());
-
             for (String var : current[i].getVariables())
                 if (!variables.contains(var))
                     throw new IllegalArgumentException("Undefined variable: " + var);

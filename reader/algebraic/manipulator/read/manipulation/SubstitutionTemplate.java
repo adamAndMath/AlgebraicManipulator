@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
+
 public class SubstitutionTemplate implements ManipulationTemplate {
     public Path path;
     public int from;
@@ -35,13 +37,14 @@ public class SubstitutionTemplate implements ManipulationTemplate {
             reader.assertIgnore(Token.GREAT);
         } else dummy = List.of();
 
-        reader.assertIgnore(Token.LPAR);
+        if (reader.isRead(Token.LPAR)) {
+            parameters = !reader.isCurrent(Token.RPAR)
+                    ? reader.readList(Token.COMMA, w -> w.isRead(Token.DASH) ? null : WorkReader.readStatement(w))
+                    : new ArrayList<>();
 
-        parameters = !reader.isCurrent(Token.RPAR)
-                ? reader.readList(Token.COMMA, WorkReader::readStatement)
-                : new ArrayList<>();
+            reader.assertIgnore(Token.RPAR);
+        }
 
-        reader.assertIgnore(Token.RPAR);
         reader.assertIgnore(Token.COLON);
 
         position = reader.readList(Token.COMMA, TokenReader::readInt);
@@ -60,7 +63,9 @@ public class SubstitutionTemplate implements ManipulationTemplate {
                 to,
                 position.stream().mapToInt(i -> i).toArray(),
                 dummy,
-                parameters
+                parameters == null
+                        ? Stream.generate(() -> (Statement)null).limit(project.getWork(file, path).variables().size()).collect(toList())
+                        : parameters
         );
     }
 }
