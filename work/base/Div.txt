@@ -48,15 +48,11 @@ work Commute(Complex a, Complex b, Complex c) {
 
 work Commute2(Complex a, Complex b, Complex c) {
     let 3 div(mult(a,b),c);
-    substitute Mult2[0->1]:1;
-    substitute Mult.Associate[0->1]:1;
-    substitute Mult2[1->0]:1,1;
-
-    substitute Mult2[0->1]:2;
-    substitute Mult.Associate[0->1]:2;
+    substitute Mult2[0->1]:[1|2];
+    substitute Mult.Associate[0->1]:[1|2];
     substitute Mult.Commute[0->1]:2,1;
     substitute Mult.Associate[1->0]:2;
-    substitute Mult2[1->0]:2,0;
+    substitute Mult2[1->0]:[1,1|2,0];
 } result {
     div(mult(a,b),c)=mult(a,div(b,c))=mult(div(a,c),b)
 }
@@ -66,10 +62,8 @@ work Distribute(Complex f, Complex a, Complex b) {
     substitute Mult2[0->1]:1;
     substitute Mult.Commute[0->1]:1;
     substitute Mult.Distribute[0->1]:1;
-    substitute Mult.Commute[1->0]:1,0;
-    substitute Mult.Commute[1->0]:1,1;
-    substitute Mult2[1->0]:1,0;
-    substitute Mult2[1->0]:1,1;
+    substitute Mult.Commute[1->0]:1,[0|1];
+    substitute Mult2[1->0]:1,[0|1];
 } result {
     div(add(a,b),f)=add(div(a,f),div(b,f))
 }

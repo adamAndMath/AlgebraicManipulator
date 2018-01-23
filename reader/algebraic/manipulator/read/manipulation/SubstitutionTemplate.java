@@ -1,5 +1,6 @@
 package algebraic.manipulator.read.manipulation;
 
+import algebraic.manipulator.PathTree;
 import algebraic.manipulator.WorkFile;
 import algebraic.manipulator.WorkProject;
 import algebraic.manipulator.manipulation.Substitution;
@@ -21,7 +22,7 @@ public class SubstitutionTemplate implements ManipulationTemplate {
     public int to;
     public List<String> dummy;
     public List<Statement> parameters;
-    public List<Integer> position;
+    public PathTree<?> position;
 
     public SubstitutionTemplate(TokenReader reader) throws IOException {
         path = reader.readReduce(Token.DOT, w -> Paths.get(w.readString()), (w, p) -> p.resolve(w.readString()));
@@ -47,7 +48,7 @@ public class SubstitutionTemplate implements ManipulationTemplate {
 
         reader.assertIgnore(Token.COLON);
 
-        position = reader.readList(Token.COMMA, TokenReader::readInt);
+        position = WorkReader.readPaths(reader);
     }
 
     @Override
@@ -61,7 +62,7 @@ public class SubstitutionTemplate implements ManipulationTemplate {
                 path,
                 from,
                 to,
-                position.stream().mapToInt(i -> i).toArray(),
+                position,
                 dummy,
                 parameters == null
                         ? Stream.generate(() -> (Statement)null).limit(project.getWork(file, path).variables().size()).collect(toList())

@@ -36,15 +36,13 @@ induction CombineInt(Complex a, Complex n, Integer m) {
     } m+ {
         call x mult(x,pow(a,n));
         substitute Identity[1->0]:0,1;
-        substitute Definition[1->0]:0;
-        substitute Definition[1->0]:1;
+        substitute Definition[1->0]:[0|1];
         substitute Mult.Identity[0->1]:1,1,1;
         substitute Mult.Distribute[1->0]:1,1;
     } m- {
         call x div(x,pow(a,n));
         substitute Identity[1->0]:0,1;
-        substitute Division[1->0]:0;
-        substitute Division[1->0]:1;
+        substitute Division[1->0]:[0|1];
         substitute Mult.Identity[0->1]:1,1,1;
         substitute Mult.DistributeSub[1->0]:1,1;
     }

@@ -138,20 +138,6 @@ public class Operation extends Statement {
         return new PathTree<>(map);
     }
 
-    @Override
-    public Statement replace(int[] position, int depth, int i, Function<Statement, Statement> function) {
-        if (i != position[depth]) return clone();
-
-        if (depth == position.length - 1)
-            return function.apply(this);
-
-        return new Operation(
-                getName(),
-                Arrays.stream(dummies).map(Variable::clone).toArray(Variable[]::new),
-                IntStream.range(0, parameterCount()).mapToObj(par -> getParameter(par).replace(position, depth+1, par, function)).toArray(Statement[]::new)
-        );
-    }
-
     public<T> Statement replace(PathTree<T> positions, BiFunction<T, Statement, Statement> function) {
         if (positions == null) return clone();
 

@@ -48,21 +48,12 @@ work Commute(Complex a, Complex b, Complex c) {
 
 work Commute2(Complex a, Complex b, Complex c) {
     let 4 sub(add(a,b),c);
-    substitute Add2[0->1]:1;
-    substitute Add.Associate[0->1]:1;
-    substitute Add2[1->0]:1,1;
+    substitute Add2[0->1]:[1|2|3];
+    substitute Add.Associate[0->1]:[1|2|3];
+    substitute Add.Commute[0->1]:[2,1|3,1];
+    substitute Add.Associate[1->0]:[2|3];
+    substitute Add2[1->0]:[1,1|2,0|3,0];
 
-    substitute Add2[0->1]:2;
-    substitute Add.Associate[0->1]:2;
-    substitute Add.Commute[0->1]:2,1;
-    substitute Add.Associate[1->0]:2;
-    substitute Add2[1->0]:2,0;
-
-    substitute Add2[0->1]:3;
-    substitute Add.Associate[0->1]:3;
-    substitute Add.Commute[0->1]:3,1;
-    substitute Add.Associate[1->0]:3;
-    substitute Add2[1->0]:3,0;
     substitute Add1[0->2](-,b):3,0,1;
     substitute Commute[2->0]:3,0;
     substitute Add1[2->0](-,b):3;

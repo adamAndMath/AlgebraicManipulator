@@ -1,5 +1,6 @@
 package algebraic.manipulator.manipulation;
 
+import algebraic.manipulator.PathTree;
 import algebraic.manipulator.WorkFile;
 import algebraic.manipulator.WorkProject;
 import algebraic.manipulator.statement.Operation;
@@ -11,18 +12,18 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class Rename implements Manipulation {
-    private final int[] position;
+    private final PathTree<?> position;
     private final String from;
     private final String to;
 
-    public Rename(int[] position, String from, String to) {
+    public Rename(PathTree<?> position, String from, String to) {
         this.position = position;
         this.from = from;
         this.to = to;
     }
 
-    public int[] getPosition() {
-        return position.clone();
+    public PathTree<?> getPosition() {
+        return position;
     }
 
     public String getFrom() {
@@ -40,7 +41,7 @@ public class Rename implements Manipulation {
 
     @Override
     public Statement apply(WorkProject project, WorkFile file, int i, Statement statement) {
-        return statement.replace(position, 0, i, this::rename);
+        return statement.replace(position, (o, s) -> rename(s));
     }
 
     private Statement rename(Statement statement) {

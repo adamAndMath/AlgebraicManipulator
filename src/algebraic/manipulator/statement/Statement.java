@@ -34,17 +34,8 @@ public abstract class Statement {
         return new PathTree<>();
     }
 
-    public Statement replace(int[] position, int depth, int i, Function<Statement, Statement> function) {
-        if (i != position[depth]) return clone();
-
-        if (depth == position.length - 1)
-            return function.apply(this);
-
-        throw new IllegalStateException("Illegal path");
-    }
-
     public<T> Statement replace(PathTree<T> positions, BiFunction<T, Statement, Statement> function) {
-        if (positions == null) return clone();
+        if (positions == null || positions.isEmpty()) return clone();
 
         if (positions.isLeaf())
             return function.apply(positions.getLeaf(), this);

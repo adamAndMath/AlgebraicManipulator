@@ -1,5 +1,6 @@
 package algebraic.manipulator.manipulation;
 
+import algebraic.manipulator.PathTree;
 import algebraic.manipulator.WorkFile;
 import algebraic.manipulator.WorkProject;
 import algebraic.manipulator.statement.Operation;
@@ -9,13 +10,12 @@ import algebraic.manipulator.statement.Variable;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class FromEval implements Manipulation {
-    private final int[] position;
+    private final PathTree<?> position;
 
-    public FromEval(int[] position) {
+    public FromEval(PathTree<?> position) {
         this.position = position;
     }
 
@@ -26,7 +26,7 @@ public class FromEval implements Manipulation {
 
     @Override
     public Statement apply(WorkProject project, WorkFile file, int i, Statement statement) {
-        return statement.replace(position, 0, i, this::replace);
+        return statement.replace(position.sub(i), (o, s) -> replace(s));
     }
 
     private Statement replace(Statement statement) {

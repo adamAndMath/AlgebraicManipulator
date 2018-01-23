@@ -9,7 +9,7 @@ assume Sum<i,r>(Func<List<Integer,Complex>,Complex> f, Integer a, Integer b)
 work Identity<i>(Func<Integer,Complex> f, Integer a) {
     let 2 sum<i>(eval(f,i),a,sub(a,1));
     substitute Sum[0->1]<i,r>:1;
-    toeval(j:[1,1,0,0],q=r:[0]):1,0;
+    toeval(j:[1,1,0,0],q:[0]):1,0;
     substitute Sub.Commute2[2->0]:1,2;
     substitute Sub.Add1[2->0]:1,2,0;
     substitute Sub.Inverse[0->1]:1,2;
@@ -21,7 +21,7 @@ work Identity<i>(Func<Integer,Complex> f, Integer a) {
 work Rec<i>(Func<Integer,Complex> f, Integer a, Integer b) {
     let 2 sum<i>(eval(f,i),a,b);
     substitute Sum[0->1]<i,r>:1;
-    toeval(j:[1,1,0,0],q=r:[0]):1,0;
+    toeval(j:[1,1,0,0],q:[0]):1,0;
     substitute Rec.Rec[0->1]<i,r>:1;
     fromeval:1,2,0;
     fromeval:1;
@@ -53,19 +53,15 @@ induction Rec2<i>(Func<Integer,Complex> f, Integer a, Integer b) {
         substitute Identity[1->0]<i>(f,add(a,1)):1,1;
         substitute Sub.Add1[1->0]:1,1,2;
     } b+ {
-        substitute Sub.Add1[0->1](-,1):0,2;
-        substitute Sub.Add1[0->1](-,1):1,1,2;
+        substitute Sub.Add1[0->1](-,1):[0,2|1,1,2];
         call x add(x,eval(f,add(b,1)));
         substitute Add.Associate[0->1]:1;
-        substitute Rec[1->0]<i>:0;
-        substitute Rec[1->0]<i>:1,1;
+        substitute Rec[1->0]<i>:[0|1,1];
     } b- {
-        substitute Rec[0->1]<i>:0;
-        substitute Rec[0->1]<i>:1,1;
+        substitute Rec[0->1]<i>:[0|1,1];
         substitute Add.Associate[1->0]:1;
         call x sub(x,eval(f,b));
-        substitute Sub.Add1[1->0]:0;
-        substitute Sub.Add1[1->0]:1;
+        substitute Sub.Add1[1->0]:[0|1];
     }
 } result {
     sum<i>(eval(f,i),a,b)=add(eval(f,a),sum<i>(eval(f,i),add(a,1),b))
@@ -74,12 +70,11 @@ induction Rec2<i>(Func<Integer,Complex> f, Integer a, Integer b) {
 work IndexShift<i>(Func<Integer,Complex> f, Integer a, Integer b, Integer c) {
     let 2 sum<i>(eval(f,i),a,b);
     substitute Sum[0->1]<i,r>:1;
-    substitute Sub.Add1[0->1](-,c):1,2,0,0;
+    substitute Sub.Add1[0->1](-,c):1,[2,0,0|0,1,1];
     substitute Sub.Commute[1->2]:1,2,0;
-    substitute Sub.Add1[0->1](-,c):1,0,1,1;
+    substitute Sub.Commute2[2->0]:1,0,1,1,0;
+    substitute Add.Associate[0->1]:1,0,1,1,0,0;
     toeval(j:[1,0]):1,0,1;
-    substitute Sub.Commute2[2->0]:1,0,1,1;
-    substitute Add.Associate[0->1]:1,0,1,1,0;
     substitute Sum[1->0]<i,r>:1;
     fromeval:1,0;
 } result {
@@ -105,44 +100,37 @@ induction Reverse<i>(Func<Integer,Complex> f, Integer a, Integer b) {
         substitute Sub.Negate[1->0](a):1,1,1;
         substitute Sub.Commute[0->2]:1,0,2;
         call x sub(x,eval(f,a));
-        substitute Sub.Add1[1->0]:0;
-        substitute Sub.Add1[1->0]:1;
+        substitute Sub.Add1[1->0]:[0|1];
     } a- {
-        substitute Sub.Add1[0->2](-,1):0,1;
-        substitute Sub.Add1[0->2](-,1):1,2,1;
+        substitute Sub.Add1[0->2](-,1):[0,1|1,2,1];
         substitute Sub.Commute[2->0]:1,2;
         call x add(x,eval(f,sub(a,1)));
         substitute Add.Commute[0->1]:0;
         substitute Rec2[1->0]<i>:0;
         substitute Sub.Negate[0->1]:1,1,1;
-        toeval(j:[1,1]):1,0,0;
-        toeval(j:[1,1]):1,1;
+        toeval(j:[1,1]):1,[0,0|1];
         substitute Rec[1->0]<i>:1;
         fromeval:1,0;
     } b+ {
-        substitute Sub.Add1[0->1](-,1):0,2;
-        substitute Sub.Add1[0->1](-,1):1,1,1;
+        substitute Sub.Add1[0->1](-,1):[0,2|1,1,1];
         substitute Sub.Commute2[3->2]:1,1;
         call x add(x,eval(f,add(b,1)));
         substitute Add.Commute[0->1]:1;
         substitute Rec[1->0]<i>:0;
         substitute Sub.Negate[0->1]:1,0,1;
-        toeval(j:[1,1]):1,1,0;
-        toeval(j:[1,1]):1,0;
+        toeval(j:[1,1]):1,[1,0|0];
         substitute Rec2[1->0]<i>:1;
         fromeval:1,0;
     } b- {
         substitute Rec[0->1]<i>:0;
         toeval(j:[1,1]):1,0;
         substitute Rec2[0->1]<i>:1;
-        fromeval:1,0;
-        fromeval:1,1,0;
+        fromeval:1,[0|1,0];
         substitute Add.Commute[0->1]:1;
         substitute Sub.Negate[1->0](b):1,1,1;
         substitute Sub.Commute2[2->3]:1,0,1;
         call x sub(x,eval(f,b));
-        substitute Sub.Add1[1->0]:0;
-        substitute Sub.Add1[1->0]:1;
+        substitute Sub.Add1[1->0]:[0|1];
     }
 } result {
     sum<i>(eval(f,i),a,b)=sum<i>(eval(f,sub(0,i)),sub(0,b),sub(0,a))
@@ -157,8 +145,7 @@ induction RangeSplit<i,j>(Func<Integer,Complex> f, Integer a, Integer b, Integer
     } c+ {
         call x add(x,eval(f,add(c,1)));
         substitute Add.Associate[0->1]:1;
-        substitute Sub.Add1[0->1](-,1):0,0,2;
-        substitute Sub.Add1[0->1](-,1):1,1,0,2;
+        substitute Sub.Add1[0->1](-,1):[0,0,2|1,1,0,2];
         substitute Rec[1->0]<i>:0;
         substitute Rec[1->0]<j>:1,1;
     } c- {
@@ -166,8 +153,7 @@ induction RangeSplit<i,j>(Func<Integer,Complex> f, Integer a, Integer b, Integer
         substitute Rec[0->1]<j>:1,1;
         substitute Add.Associate[1->0]:1;
         call x sub(x,eval(f,c));
-        substitute Sub.Add1[1->0]:0;
-        substitute Sub.Add1[1->0]:1;
+        substitute Sub.Add1[1->0]:[0|1];
     }
 } result {
     sum<i>(eval(f,i),a,c)=add(sum<i>(eval(f,i),a,b),sum<j>(eval(f,j),add(b,1),c))
@@ -183,25 +169,17 @@ induction Factor<i>(Func<Integer,Complex> f, Complex c, Integer a, Integer b) {
     } b+ {
         call x add(x,mult(c,eval(f,add(b,1))));
         substitute Mult.Distribute[1->0]:0;
-        substitute Sub.Add1[0->1](-,1):0,1,0,2;
-        substitute Rec[1->0]<i>:0,1;
-
-        toeval(k:[1,1]):1,0,0;
-        toeval(k:[1,1]):1,1;
-        substitute Sub.Add1[0->1](-,1):1,0,2;
-        substitute Rec[1->0]<i>:1;
+        substitute Sub.Add1[0->1](-,1):[0,1,0,2|1,0,2];
+        toeval(k:[1,1]):1,[0,0|1];
+        substitute Rec[1->0]<i>:[0,1|1];
         fromeval:1,0;
     } b- {
-        substitute Rec[0->1]<i>(f,a,b):0,1;
-        substitute Mult.Distribute[0->1]:0;
         toeval(k:[1,1]):1,0;
-        substitute Rec[0->1]<i>:1;
-        fromeval:1,0,0;
-        fromeval:1,1;
-
+        substitute Rec[0->1]<i>:[0,1|1];
+        fromeval:1,[0,0|1];
+        substitute Mult.Distribute[0->1]:0;
         call x sub(x,mult(c,eval(f,b)));
-        substitute Sub.Add1[1->0]:0;
-        substitute Sub.Add1[1->0]:1;
+        substitute Sub.Add1[1->0]:[0|1];
     }
 } result {
     mult(c,sum<i>(eval(f,i),a,b))=sum<i>(mult(c,eval(f,i)),a,b)
@@ -224,27 +202,19 @@ induction Distribute<i,j>(Func<Integer,Complex> f, Func<Integer,Complex> g, Inte
         substitute Add.Associate[1->0]:1,0;
         substitute Add.Associate[0->1]:1;
 
-        toeval(k:[0,1|1,1]):0,0,0;
-        toeval(k:[0,1|1,1]):0,1;
+        substitute Sub.Add1[0->1](-,1):[0,0,2|1,0,0,2|1,1,0,2];
 
-        substitute Sub.Add1[0->1](-,1):0,0,2;
-        substitute Sub.Add1[0->1](-,1):1,0,0,2;
-        substitute Sub.Add1[0->1](-,1):1,1,0,2;
-
-        substitute Rec[1->0]<i>:0;
-        substitute Rec[1->0]<i>:1,0;
+        toeval(k:[0,1|1,1]):0,[0,0|1];
+        substitute Rec[1->0]<i>:[0|1,0];
         substitute Rec[1->0]<j>:1,1;
-
         fromeval:0,0;
     } b- {
         toeval(k:[0,1|1,1]):0,0;
 
-        substitute Rec[0->1]<i>:0;
-        substitute Rec[0->1]<i>:1,0;
+        substitute Rec[0->1]<i>:[0|1,0];
         substitute Rec[0->1]<j>:1,1;
 
-        fromeval:0,0,0;
-        fromeval:0,1;
+        fromeval:0,[0,0|1];
 
         substitute Add.Associate[1->0]:1;
         substitute Add.Associate[0->1]:1,0;
@@ -253,9 +223,7 @@ induction Distribute<i,j>(Func<Integer,Complex> f, Func<Integer,Complex> g, Inte
         substitute Add.Associate[0->1]:1;
 
         call x sub(x,add(eval(f,b),eval(g,b)));
-
-        substitute Sub.Add1[1->0]:0;
-        substitute Sub.Add1[1->0]:1;
+        substitute Sub.Add1[1->0]:[0|1];
     }
 } result {
     sum<i>(add(eval(f,i),eval(g,i)),a,b)=add(sum<i>(eval(f,i),a,b),sum<j>(eval(g,j),a,b))
@@ -264,93 +232,63 @@ induction Distribute<i,j>(Func<Integer,Complex> f, Func<Integer,Complex> g, Inte
 induction Commute<i,j>(Func<List<Integer,Integer>,Complex> f, Integer a1, Integer b1, Integer a2, Integer b2) {
     base b1=a1, b2=a2 {
         let 2 eval(f,a1,a2);
-        toeval(a:[1]):0;
-        substitute Single[1->0]<i>:0;
-        fromeval:0,0;
+        toeval(a:[1]):[0|1];
+        substitute Single[1->0]<i>:[0|1];
+        fromeval:[0,0|1,0];
         toeval(a:[2]):0,0;
-        substitute Single[1->0]<j>:0,0;
-        fromeval:0,0,0;
-
-        toeval(a:[2]):1;
-        substitute Single[1->0]<j>:1;
-        fromeval:1,0;
-        toeval(a=a1:[1]):1,0;
-        substitute Single[1->0]<i>:1,0;
-        fromeval:1,0,0;
+        toeval(a:[0,2]):1;
+        substitute Single[1->0]<j>:[0,0|1];
+        fromeval:[0,0,0|1,0];
     } b1+ {
         call x add(x,sum<j>(eval(f,add(b1,1),j),a2,b2));
-        toeval(k:[0,1]):0,0,0;
-        toeval(k:[0,1]):0,1;
-        substitute Sub.Add1[0->1](-,1):0,0,2;
-        substitute Rec[1->0]<i>:0;
-        fromeval:0,0;
-
         toeval(k:[0,2]):1,0,0;
         toeval(k:[2]):1,1,0;
         substitute Distribute[1->0]<j,j>:1;
-        fromeval:1,0,0;
-        fromeval:1,0,1;
-        toeval(k:[1]):1,0,0,0;
-        toeval(k:[1]):1,0,1;
-        substitute Sub.Add1[0->1](-,1):1,0,0,2;
-        substitute Rec[1->0]<i>:1,0;
-        fromeval:1,0,0;
+        fromeval:1,0,[0|1];
+
+        substitute Sub.Add1[0->1](-,1):[0,0,2|1,0,0,2];
+        toeval(k:[0,1]):0,[0,0|1];
+        toeval(k:[1]):1,0,[0,0|1];
+        substitute Rec[1->0]<i>:[0|1,0];
+        fromeval:[0,0|1,0,0];
     } b1- {
         toeval(k:[0,1]):0,0;
-        substitute Rec[0->1]<i>:0;
-        fromeval:0,0,0;
-        fromeval:0,1;
-
         toeval(k:[1]):1,0,0;
-        substitute Rec[0->1]<i>:1,0;
-        fromeval:1,0,0,0;
-        fromeval:1,0,1;
+        substitute Rec[0->1]<i>:[0|1,0];
+        fromeval:[0,[0,0|1]|1,0,[0,0|1]];
+
         toeval(k:[0,2]):1,0,0;
         toeval(k:[2]):1,0,1;
         substitute Distribute[0->1]<j,j>:1;
-        fromeval:1,0,0;
-        fromeval:1,1,0;
+        fromeval:1,[0,0|1,0];
 
         call x sub(x,sum<j>(eval(f,b1,j),a2,b2));
-        substitute Sub.Add1[1->0]:0;
-        substitute Sub.Add1[1->0]:1;
+        substitute Sub.Add1[1->0]:[0|1];
     } b2+ {
         call x add(x,sum<i>(eval(f,i,add(b2,1)),a1,b1));
-        toeval(k:[0,2]):1,0,0;
-        toeval(k:[0,2]):1,1;
-        substitute Sub.Add1[0->1](-,1):1,0,2;
-        substitute Rec[1->0]<j>:1;
-        fromeval:1,0;
-
         toeval(k:[0,1]):0,0,0;
         toeval(k:[1]):0,1,0;
         substitute Distribute[1->0]<i,i>:0;
-        fromeval:0,0,0;
-        fromeval:0,0,1;
-        toeval(k:[2]):0,0,0,0;
-        toeval(k:[2]):0,0,1;
-        substitute Sub.Add1[0->1](-,1):0,0,0,2;
-        substitute Rec[1->0]<j>:0,0;
-        fromeval:0,0,0;
+        fromeval:0,0,[0|1];
+
+        substitute Sub.Add1[0->1](-,1):[0,0,0,2|1,0,2];
+        toeval(k:[2]):0,0,[0,0|1];
+        toeval(k:[0,2]):1,[0,0|1];
+        substitute Rec[1->0]<j>:[0,0|1];
+        fromeval:[0,0,0|1,0];
     } b2- {
         toeval(k:[2]):0,0,0;
-        substitute Rec[0->1]<j>:0,0;
-        fromeval:0,0,0,0;
-        fromeval:0,0,1;
+        toeval(k:[0,2]):1,0;
+        substitute Rec[0->1]<j>:[0,0|1];
+        fromeval:[0,0,[0,0|1]|1,[0,0|1]];
+
         toeval(k:[0,1]):0,0,0;
         toeval(k:[1]):0,0,1;
         substitute Distribute[0->1]<i,i>:0;
-        fromeval:0,0,0;
-        fromeval:0,1,0;
-
-        toeval(k:[0,2]):1,0;
-        substitute Rec[0->1]<j>:1;
-        fromeval:1,0,0;
-        fromeval:1,1;
+        fromeval:0,[0,0|1,0];
 
         call x sub(x,sum<i>(eval(f,i,b2),a1,b1));
-        substitute Sub.Add1[1->0]:0;
-        substitute Sub.Add1[1->0]:1;
+        substitute Sub.Add1[1->0]:[0|1];
     }
 } result {
     sum<i>(sum<j>(eval(f,i,j),a2,b2),a1,b1)=sum<j>(sum<i>(eval(f,i,j),a1,b1),a2,b2)
@@ -373,59 +311,49 @@ induction TriangleCommute<i,j>(Func<List<Integer,Integer>,Complex> f, Integer a,
         fromeval:1,0;
     } n+ {
         call x add(x,sum<j>(eval(f,add(n,1),j),a,add(n,1)));
-        toeval(k:[0,1|2]):0,0,0;
-        toeval(k:[0,1|2]):0,1;
         substitute Sub.Add1[0->1](-,1):0,0,2;
+        toeval(k:[0,1|2]):0,[0,0|1];
         substitute Rec[1->0]<i>:0;
         fromeval:0,0;
         toeval(k:[2]):1,1,0;
         substitute Rec[0->1]<j>:1,1;
+        fromeval:1,1,[0,0|1];
         substitute Sub.Add1[1->0]:1,1,0,2;
-        fromeval:1,1,0,0;
-        fromeval:1,1,1;
         substitute Add.Associate[1->0]:1;
         toeval(k:[0,2|1]):1,0,0,0;
         toeval(k:[2]):1,0,1,0;
         substitute Distribute[1->0]<j,j>:1,0;
-        fromeval:1,0,0,0;
-        fromeval:1,0,0,1;
-        toeval(k:[1]):1,0,0,0,0;
-        toeval(k:[1]):1,0,0,1;
+        fromeval:1,0,0,[0|1];
         substitute Sub.Add1[0->1](-,1):1,0,0,0,2;
+        substitute Sub.Add1[0->1](-,1):1,0,2;
+        toeval(k:[1]):1,0,0,[0,0|1];
         substitute Rec[1->0]<i>:1,0,0;
         fromeval:1,0,0,0;
         toeval(k:[1]):1,1;
         substitute Single[1->0]<i>:1,1;
         fromeval:1,1,0;
-        toeval(k:[0,2|1]):1,0,0;
-        toeval(k:[0,2|1]):1,1;
-        substitute Sub.Add1[0->1](n,1):1,0,2;
+        toeval(k:[0,2|1]):1,[0,0|1];
         substitute Rec[1->0]<j>:1;
         fromeval:1,0;
     } n- {
         toeval(k:[0,1|2]):0,0;
         substitute Rec[0->1]<i>:0;
-        fromeval:0,0,0;
-        fromeval:0,1;
+        fromeval:0,[0,0|1];
 
         toeval(k:[1]):1,0,0;
         substitute Rec[0->1]<i>:1,0;
-        fromeval:1,0,0,0;
-        fromeval:1,0,1;
+        fromeval:1,0,[0,0|1];
         toeval(k:[0,2|1]):1,0,0;
         toeval(k:[2]):1,0,1;
         substitute Distribute[0->1]<j,j>:1;
         substitute Rec[0->1]<j>:1,0;
-        fromeval:1,0,0,0;
-        fromeval:1,0,1;
-        fromeval:1,1,0;
+        fromeval:1,[0,[0,0|1]|1,0];
         toeval(k:[1]):1,0,1,0;
         substitute Identity[0->1]<i>:1,0,1;
         substitute Add.Identity[1->0]:1,0;
 
         call x sub(x,sum<j>(eval(f,n,j),a,n));
-        substitute Sub.Add1[1->0]:0;
-        substitute Sub.Add1[1->0]:1;
+        substitute Sub.Add1[1->0]:[0|1];
     }
 } result {
     sum<i>(sum<j>(eval(f,i,j),a,i),a,n)=sum<j>(sum<i>(eval(f,i,j),j,n),a,n)

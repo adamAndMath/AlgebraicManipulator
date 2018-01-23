@@ -18,11 +18,11 @@ public class Substitution implements Manipulation {
     private final Path workPath;
     private final int from;
     private final int to;
-    private final int[] position;
+    private final PathTree<?> position;
     private final List<String> dummy;
     private final List<Statement> values;
 
-    public Substitution(Path workPath, int from, int to, int[] position, List<String> dummy, List<Statement> values) {
+    public Substitution(Path workPath, int from, int to, PathTree<?> position, List<String> dummy, List<Statement> values) {
         this.workPath = workPath;
         this.from = from;
         this.to = to;
@@ -47,7 +47,7 @@ public class Substitution implements Manipulation {
         return to;
     }
 
-    public int[] getPosition() {
+    public PathTree<?> getPosition() {
         return position;
     }
 
@@ -66,7 +66,7 @@ public class Substitution implements Manipulation {
         if (dummy.size() != work.dummies().size())
             throw new IllegalStateException("Dummy count does't match referred work");
 
-        return statement.replace(position, 0, i, s -> replace(s, work));
+        return statement.replace(position.sub(i), (o, s) -> replace(s, work));
     }
 
     private Statement replace(Statement statement, Equation work) {

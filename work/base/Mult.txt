@@ -21,18 +21,11 @@ work DistributeSub(Complex f, Complex a, Complex b) {
 
 work Singularity(Complex a) {
     let 3 0;
-    substitute Sub.Inverse[1->0](a):1;
-    substitute Identity[0->1]:1,0;
-    substitute Identity[0->1]:1,1;
-    substitute DistributeSub[1->0]:1;
-    substitute Sub.Inverse[0->1]:1,1;
+    substitute Sub.Inverse[1->0](a):[1|2];
+    substitute Identity[0->1]:[1,[0|1]|2,[0|1]];
+    substitute DistributeSub[1->0]:[1|2];
+    substitute Sub.Inverse[0->1]:[1,1|2,1];
     substitute Commute[0->1]:1;
-
-    substitute Sub.Inverse[1->0](a):2;
-    substitute Identity[0->1]:2,0;
-    substitute Identity[0->1]:2,1;
-    substitute DistributeSub[1->0]:2;
-    substitute Sub.Inverse[0->1]:2,1;
 } result {
     0=mult(0,a)=mult(a,0)
 }

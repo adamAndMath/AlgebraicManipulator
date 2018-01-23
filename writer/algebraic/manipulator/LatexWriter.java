@@ -29,13 +29,6 @@ public class LatexWriter {
     public static final Map<String, String> typeNames = new HashMap<>();
     public static final List<String> colors = new ArrayList<>();
 
-    private static<T> PathTree<T> surroundTree(PathTree<T> tree, int... position) {
-        for (int i = position.length - 1; i >= 0; i--)
-            tree = new PathTree<>(position[i], tree);
-
-        return tree;
-    }
-
     public static void writeProject(PrintStream writer, WorkProject project, String title, String author) {
         LocalDate date = LocalDate.now();
 
@@ -255,13 +248,13 @@ public class LatexWriter {
             Equation work = substitution.getWork(project, file);
 
             List<String> variables = work.variables().stream().map(Definition::getName).collect(toList());
-            return surroundTree(work.getStatement(substitution.getFrom()).tree(var -> variables.contains(var.getName()) ? colors.get(variables.indexOf(var.getName())) : null), substitution.getPosition());
+            return substitution.getPosition().surround(work.getStatement(substitution.getFrom()).tree(var -> variables.contains(var.getName()) ? colors.get(variables.indexOf(var.getName())) : null));
         }
 
         if (manipulation instanceof ToEval) {
             ToEval toEval = (ToEval) manipulation;
             List<String> variables = toEval.getVariables();
-            return surroundTree(toEval.getTree().map(var -> variables.contains(var.getVariable()) ? colors.get(variables.indexOf(var.getVariable())) : null), toEval.getPosition());
+            return toEval.getPosition().surround(toEval.getTree().map(var -> variables.contains(var.getVariable()) ? colors.get(variables.indexOf(var.getVariable())) : null));
         }
 
         if (manipulation instanceof FromEval)
@@ -269,7 +262,7 @@ public class LatexWriter {
 
         if (manipulation instanceof Rename) {
             Rename rename = (Rename) manipulation;
-            return surroundTree(new PathTree<>(colors.get(0)), rename.getPosition());
+            return rename.getPosition().surround(new PathTree<>(colors.get(0)));
         }
 
         throw new IllegalStateException("Not implemented");
@@ -288,7 +281,7 @@ public class LatexWriter {
             Equation work = substitution.getWork(project, file);
 
             List<String> variables = work.variables().stream().map(Definition::getName).collect(toList());
-            return surroundTree(work.getStatement(substitution.getTo()).tree(var -> variables.contains(var.getName()) ? colors.get(variables.indexOf(var.getName())) : null), substitution.getPosition());
+            return substitution.getPosition().surround(work.getStatement(substitution.getTo()).tree(var -> variables.contains(var.getName()) ? colors.get(variables.indexOf(var.getName())) : null));
         }
 
         if (manipulation instanceof ToEval) {
@@ -299,7 +292,7 @@ public class LatexWriter {
 
             for (int i = 0; i < variables.size(); i++) children.put(i + 1, new PathTree<>(colors.get(i)));
 
-            return surroundTree(new PathTree<>(children), toEval.getPosition());
+            return toEval.getPosition().surround(new PathTree<>(children));
         }
 
         if (manipulation instanceof FromEval)
@@ -307,7 +300,7 @@ public class LatexWriter {
 
         if (manipulation instanceof Rename) {
             Rename rename = (Rename) manipulation;
-            return surroundTree(new PathTree<>(colors.get(0)), rename.getPosition());
+            return rename.getPosition().surround(new PathTree<>(colors.get(0)));
         }
 
         throw new IllegalStateException("Not implemented");

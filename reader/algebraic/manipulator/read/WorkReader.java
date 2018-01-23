@@ -1,6 +1,7 @@
 package algebraic.manipulator.read;
 
 import algebraic.manipulator.Definition;
+import algebraic.manipulator.PathTree;
 import algebraic.manipulator.read.equation.AssumptionTemplate;
 import algebraic.manipulator.read.equation.EquationTemplate;
 import algebraic.manipulator.read.equation.InductionTemplate;
@@ -44,6 +45,52 @@ public class WorkReader {
         manipulationReaders.put("fromeval", FromEvalTemplate::new);
         manipulationReaders.put("toeval", ToEvalTemplate::new);
         manipulationReaders.put("rename", RenameTemplate::new);
+    }
+
+    public static int[][] readPositions(TokenReader reader) throws IOException {
+        reader.assertIgnore(Token.LSQR);
+
+        if (reader.isRead(Token.RSQR))
+            return new int[0][];
+
+        int[][] positions = reader.readList(Token.VBAR, r -> r.readList(Token.COMMA, TokenReader::readInt).stream().mapToInt(i -> i).toArray()).toArray(new int[0][]);
+
+        reader.assertIgnore(Token.RSQR);
+
+        return positions;
+    }
+
+    public static PathTree<?> readPaths(TokenReader reader) throws IOException {
+        PathTree.Tree<Integer> tree = new PathTree.Tree<>();
+        readPaths(reader, tree);
+        return new PathTree<Integer>(tree);
+    }
+
+    public static void readPaths(TokenReader reader, PathTree.Tree<Integer> tree) throws IOException {
+        if (reader.isCurrent(Token.LSQR)) {
+            readPathsSiblings(reader, tree);
+            return;
+        }
+
+        int i = reader.readInt();
+        if (reader.isRead(Token.COMMA))
+            readPaths(reader, tree.sub(i));
+        else
+            tree.sub(i).set(0);
+    }
+
+    public static void readPathsSiblings(TokenReader reader, PathTree.Tree<Integer> tree) throws IOException {
+        reader.assertIgnore(Token.LSQR);
+
+        if (reader.isRead(Token.RSQR)) {
+            tree.set(0);
+            return;
+        }
+
+        do readPaths(reader, tree);
+        while (reader.isRead(Token.VBAR));
+
+        reader.assertIgnore(Token.RSQR);
     }
 
     public static Variable readVariable(TokenReader reader) throws IOException {

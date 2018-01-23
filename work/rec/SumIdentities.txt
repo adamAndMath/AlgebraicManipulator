@@ -12,13 +12,12 @@ work GeometricSum<i>(Complex a, Integer n) {
     toeval(k:[1,0]):1,0,1;
     substitute Sum.Factor[1->0]<i>:1;
     fromeval:1,1,0;
-    substitute Sub.Add1[0->2](-,1):1,1,1;
-    substitute Sub.Add1[0->2](-,1):1,1,2;
+    substitute Sub.Add1[0->2](-,1):1,1,[1|2];
     toeval(k:[1]):1,1,0;
     substitute Sum.IndexShift[1->0]<i>:1,1;
     substitute Sum.Rec2[0->1]<i>:1,1;
-    substitute Sub.Add1[2->0]:1,1,1,1;
     fromeval:1,1,0;
+    substitute Sub.Add1[2->0]:1,1,1,1;
     substitute Mult.Distribute[0->1]:1;
     substitute Pow.Definition[1->0]:1,0;
     substitute Sub.Add2[1->0]:1,0,1;
