@@ -18,7 +18,8 @@ public class PathTree<T> {
 
         public Tree(PathTree<T> tree) {
             children = tree.children.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> new Tree<>(e.getValue())));
-            set(tree.getLeaf());
+            if (tree.isLeaf())
+                set(tree.getLeaf());
         }
 
         public void union(Tree<?> tree, T leaf) {
