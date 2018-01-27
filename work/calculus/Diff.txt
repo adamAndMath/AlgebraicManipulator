@@ -1,12 +1,168 @@
-assume Lim<h>(Func<Complex,Complex> f, Complex x)
-    diff(eval(f,x),x)=lim<h>(h,div(sub(eval(f,add(x,h)),eval(f,x)),h));
+using base.Add;
+using base.Sub;
+using base.Mult;
+using base.Div;
 
-/*work Const(Complex a, Complex x) {
+assume Lim<h>(Func<Complex,Complex> f, Complex x)
+    diff(eval(f,x),x)=lim<h>(0,div(sub(eval(f,add(x,h)),eval(f,x)),h));
+
+work Factor(Func<Complex,Complex> f, Complex a, Complex x) {
+    let 2 diff(mult(a,eval(f,x)),x);
+    toeval(v=x:[1,1]):1,0;
+    substitute Lim[0->1]<h>:1;
+    fromeval:1,1,0,[0|1];
+    substitute Mult.DistributeSub[1->0]:1,1,0;
+    substitute Div.Commute2[0->1]:1,1;
+    toeval(v:[0,0,1,1|1]):1,1,1;
+    toeval(u:[1]):1,1;
+    substitute Lim.Func[0->1]<h>:1;
+    fromeval:1;
+    fromeval:1,1,1;
+    substitute Lim[1->0]<h>:1,1;
+} result {
+    diff(mult(a,eval(f,x)),x)=mult(a,diff(eval(f,x),x))
+}
+
+work Distribute(Func<Complex,Complex> f, Func<Complex,Complex> g, Complex x) {
+    let 2 diff(add(eval(f,x),eval(g,x)),x);
+    toeval(v:[0,1|1,1]):1,0;
+    substitute Lim[0->1]<h>:1;
+    fromeval:1,1,0,[0|1];
+    substitute Sub.Commute2[0->2]:1,1,0;
+    substitute Sub.Commute[2->0]:1,1,0,0;
+    substitute Sub.Commute2[2->1]:1,1,0;
+    substitute Div.Distribute[0->1]:1,1;
+    toeval(v:[0,0,1,1|1]):1,1,[0|1];
+    toeval(p:[0],q:[1]):1,1;
+    substitute Lim.Func2[0->1]<h>:1;
+    fromeval:1;
+    fromeval:1,[0,1|1,1];
+    substitute Lim[1->0]<h>:1,[0|1];
+} result {
+    diff(add(eval(f,x),eval(g,x)),x)=add(diff(eval(f,x),x),diff(eval(g,x),x))
+}
+
+work DistributeSub(Func<Complex,Complex> f, Func<Complex,Complex> g, Complex x) {
+    let 2 diff(sub(eval(f,x),eval(g,x)),x);
+    substitute Sub.Add2[0->1]:1,0;
+    substitute Mult.Sub[0->1]:1,0,1;
+    toeval(v:[1,1]):1,0,1;
+    substitute Distribute[0->1]:1;
+    fromeval:1,1,0;
+    substitute Factor[0->1]:1,1;
+    substitute Mult.Sub[1->0]:1,1;
+    substitute Sub.Add2[1->0]:1;
+} result {
+    diff(sub(eval(f,x),eval(g,x)),x)=sub(diff(eval(f,x),x),diff(eval(g,x),x))
+}
+
+work Product(Func<Complex,Complex> f, Func<Complex,Complex> g, Complex x) {
+    let 2 diff(mult(eval(f,x),eval(g,x)),x);
+    toeval(v:[0,1|1,1]):1,0;
+    substitute Lim[0->1]<h>:1;
+    fromeval:1,1,0,[0|1];
+    substitute Sub.Add1[0->2](-,eval(f,x)):1,1,0,0,0;
+    substitute Sub.Add1[0->2](-,eval(g,x)):1,1,0,0,1;
+    substitute Mult.Commute[0->1]:1,1,0,0;
+    substitute Mult.Distribute[0->1]:1,1,0,0;
+    substitute Mult.Commute[0->1]:1,1,0,0,[0|1];
+    substitute Mult.Distribute[0->1]:1,1,0,0,[0|1];
+    substitute Add.Associate[1->0]:1,1,0,0;
+    substitute Sub.Add1[1->0]:1,1,0;
+    substitute Div.Distribute[0->1]:1,1;
+    substitute Div.Distribute[0->1]:1,1,0;
+    substitute Div.Commute2[0->1]:1,1,0,0;
+    substitute Div.Mult1[0->2](-,h):1,1,0,0,0;
+    substitute Mult.Commute[0->1]:1,1,0,0,0;
+    substitute Div.Commute2[0->2]:1,1,0,1;
+    substitute Div.Commute2[0->1]:1,1,1;
+
+    toeval(v:[0,[0,[0|1,[0,0,1,1|1]]|1,[0,0,1,1|1]]|1,0,[0,0,1,1|1]]):1,1,0;
+    toeval(v:[1,0,0,1,1|1,1]):1,1,1;
+    toeval(a:[0],b:[1]):1,1;
+    substitute Lim.Func2[0->1]<h>:1;
+    fromeval:1;
+    fromeval:1,[0,1|1,1];
+
+    toeval(v:[0,[0|1,[0,0,1,1|1]]|1,[0,0,1,1|1]]):1,0,1,0;
+    toeval(v:[0,[0,0,1,1|1]]):1,0,1,1;
+    toeval(a:[0],b:[1]):1,0,1;
+    substitute Lim.Func2[0->1]<h>:1,0;
+    fromeval:1,0;
+    fromeval:1,0,[0,1|1,1];
+
+    toeval(v:[0|1,[0,0,1,1|1]]):1,0,0,1,0;
+    toeval(v:[0,0,1,1|1]):1,0,0,1,1;
+    toeval(a:[0],b:[1]):1,0,0,1;
+    substitute Lim.Func2[0->1]<h>:1,0,0;
+    fromeval:1,0,0;
+    fromeval:1,0,0,[0,1|1,1];
+
+    toeval(v:[]):1,0,0,0,1,0;
+    toeval(v:[0,0,1,1|1]):1,0,0,0,1,1;
+    toeval(a:[0],b:[1]):1,0,0,0,1;
+    substitute Lim.Func2[0->1]<h>:1,0,0,0;
+    fromeval:1,0,0,0;
+    fromeval:1,0,0,0,[0,1|1,1];
+
+    toeval(v:[0,0,1,1|1]):1,0,1,1,0;
+    toeval(v:[0,0,1,1|1]):1,1,1,1;
+    toeval(u:[0]):1,0,1,1;
+    toeval(u:[1]):1,1,1;
+    substitute Lim.Func[0->1]<h>(0,-,-):1,[0,1|1];
+    fromeval:1,[0,1|1];
+    fromeval:1,[0,1,0,1|1,1,1];
+
+    substitute Lim[1->0]<h>:1,[0,[0,[0,1|1]|1,0]|1,1];
+    toeval(v:[]):1,0,0,0,0,1;
+    substitute Lim.Resolve[0->1]<h>:1,0,0,0,0;
+    fromeval:1,0,0,0,0;
+    substitute Mult.Singularity[1->0]:1,0,0,0;
+    substitute Mult.Singularity[1->0]:1,0,0;
+    substitute Add.Identity[2->0]:1,0;
+} result {
+    diff(mult(eval(f,x),eval(g,x)),x)=add(mult(diff(eval(f,x),x),eval(g,x)),mult(eval(f,x),diff(eval(g,x),x)))
+}
+
+work Chain(Func<Complex,Complex> f, Func<Complex,Complex> g, Complex x) {
+    let 2 diff(eval(f,eval(g,x)),x);
+    toeval(v:[1,1]):1,0;
+    substitute Lim[0->1]<h>:1;
+    fromeval:1,1,0,[0|1];
+    substitute Sub.Add1[0->2](-,eval(g,x)):1,1,0,0,1;
+    substitute Add.Commute[0->1]:1,1,0,0,1;
+    substitute Div.Mult1[0->1](-,sub(eval(g,add(x,h)),eval(g,x))):1,1;
+    substitute Div.Commute2[2->1]:1,1,0;
+    substitute Div.Commute2[0->2]:1,1;
+    toeval(v:[0,0,1,1|1]):1,1,[0|1];
+    toeval(u:[0,1,1]):1,1,0,1;
+    toeval(w:[1,1]):1,1,0;
+    toeval(a:[0],b:[1]):1,1;
+    substitute Lim.Func2[0->1]<h>:1;
+    fromeval:1;
+    fromeval:1,[0,1|1,1];
+    substitute Lim.Func[0->2]<h>:1,0;
+    fromeval:1,0,[0|1];
+    substitute Add.Identity[1->0]:1,0,0,0,1;
+    substitute Sub.Inverse[0->1]:1,0,0;
+    substitute Lim[1->0]<h>:1,[0|1];
+} result {
+    diff(eval(f,eval(g,x)),x)=mult(diff(eval(f,eval(g,x)),eval(g,x)),diff(eval(g,x),x))
+}
+
+work Constant(Complex a, Complex x) {
     let 2 diff(a,x);
-    toeval(c=x:[]):1,0;
-    substitute Lim[0->1](func<c>(a),x):1;
-    fromeval
-}*/
+    toeval(v=x):1,0;
+    substitute Lim[0->1]<h>:1;
+    fromeval:1,1,0,[0|1];
+    substitute Sub.Inverse[0->1]:1,1,0;
+    substitute Div.Singularity[1->0]:1,1;
+    toeval(v=h):1,1;
+    substitute Lim.Resolve[0->1]<h>:1;
+    fromeval:1;
+} result {
+    diff(a,x)=0
+}
 
 /*work Pow(Complex a, Complex x) {
     let 2 diff(pow(x,a),x);
