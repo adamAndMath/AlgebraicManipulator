@@ -29,3 +29,13 @@ work Singularity(Complex a) {
 } result {
     0=mult(0,a)=mult(a,0)
 }
+
+work Sub(Complex a) {
+    let 3 sub(0,a);
+    substitute Singularity[0->2](a):[1,0|2,0];
+    substitute Identity[0->1]:[1,1|2,1];
+    substitute DistributeSub[1->0]:[1|2];
+    substitute Commute[0->1]:1;
+} result {
+    sub(0,a)=mult(sub(0,1),a)=mult(a,sub(0,1))
+}
