@@ -80,12 +80,16 @@ public class Substitution implements Manipulation {
             if (values.get(i) != null)
                 pars.put(work.getVariable(i).getName(), values.get(i));
 
-        statement.get(tree, (v, s) -> {
-            if (!pars.containsKey(v))
-                pars.put(v, s);
-            else if (!pars.get(v).equals(s))
-                throw new IllegalStateException("Expected parameter " + pars.get(v) + ", but received " + s);
-        });
+        try {
+            statement.get(tree, (v, s) -> {
+                if (!pars.containsKey(v))
+                    pars.put(v, s);
+                else if (!pars.get(v).equals(s))
+                    throw new IllegalStateException("Expected parameter " + pars.get(v) + ", but received " + s);
+            });
+        } catch (Exception e) {
+            throw new IllegalStateException("Expected substitute of " + fromStatement.toString() + ", but received " + statement.toString());
+        }
 
         fromStatement = fromStatement.setAll(v -> set(work, pars, v));
 
