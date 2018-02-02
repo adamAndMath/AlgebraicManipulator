@@ -3,10 +3,14 @@ package algebraic.manipulator.type;
 import java.util.Objects;
 
 public class SimpleType implements Type {
-    public final String name;
+    private final String name;
 
     public SimpleType(String name) {
         this.name = name;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override

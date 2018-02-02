@@ -24,6 +24,10 @@ public class FromEval implements Manipulation {
         return Stream.empty();
     }
 
+    public PathTree<?> getPosition() {
+        return position;
+    }
+
     @Override
     public Statement apply(WorkProject project, WorkFile file, int i, Statement statement) {
         return statement.replace(position.sub(i), (o, s) -> replace(s));

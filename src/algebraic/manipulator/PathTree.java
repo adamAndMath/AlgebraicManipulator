@@ -3,6 +3,7 @@ package algebraic.manipulator;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
@@ -120,6 +121,14 @@ public class PathTree<T> {
     @Override
     public String toString() {
         return isLeaf() ? getLeaf().toString() : children.entrySet().stream().map(e -> e.getKey() + ": " + e.getValue()).collect(Collectors.joining(", ", "{", "}"));
+    }
+
+    public int count() {
+        return children.size();
+    }
+
+    public IntStream keys() {
+        return children.keySet().stream().mapToInt(i -> i);
     }
 
     public Stream<T> stream() {

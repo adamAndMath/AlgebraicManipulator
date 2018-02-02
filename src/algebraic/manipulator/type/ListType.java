@@ -1,10 +1,11 @@
 package algebraic.manipulator.type;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ListType implements Type {
+public class ListType implements Type, Iterable<Type> {
     private final Type[] types;
 
     public ListType(Type... types) {
@@ -36,6 +37,11 @@ public class ListType implements Type {
 
     public Type[] getTypes() {
         return types.clone();
+    }
+
+    @Override
+    public Iterator<Type> iterator() {
+        return Arrays.asList(types).iterator();
     }
 
     public Stream<Type> stream() {

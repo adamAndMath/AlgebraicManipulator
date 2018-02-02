@@ -53,6 +53,10 @@ public class WorkFile {
         using.put(key, path);
     }
 
+    public Map<String, Path> getUsing() {
+        return Collections.unmodifiableMap(using);
+    }
+
     public Path absolutePath(Path path) {
         switch (path.getNameCount()) {
             case 1:

@@ -37,7 +37,7 @@ public class ToEval implements Manipulation {
             return statement;
         }
 
-        private PathTree<?> getPositions() {
+        public PathTree<?> getPositions() {
             return positions;
         }
     }
@@ -62,6 +62,10 @@ public class ToEval implements Manipulation {
 
     public List<String> getVariables() {
         return Arrays.stream(parameters).map(Parameter::getVariable).collect(toList());
+    }
+
+    public Parameter[] getParameters() {
+        return parameters.clone();
     }
 
     @Override

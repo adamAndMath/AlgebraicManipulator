@@ -98,7 +98,7 @@ public class LatexWriter {
     public static void writeType(PrintStream writer, Type type) {
         if (type instanceof SimpleType) {
             SimpleType simple = (SimpleType) type;
-            writer.print(typeNames.containsKey(simple.name) ? typeNames.get(simple.name) : simple.name);
+            writer.print(typeNames.containsKey(simple.getName()) ? typeNames.get(simple.getName()) : simple.getName());
         } else if (type instanceof Func) {
             writer.print("\\left(");
             writeType(writer, ((Func) type).from);
@@ -107,7 +107,7 @@ public class LatexWriter {
             writer.print("\\right)");
         } else if (type instanceof ListType) {
             writer.print("\\left(");
-            writeList(writer, Arrays.asList(((ListType) type).getTypes()), ",", LatexWriter::writeType);
+            writeList(writer, (ListType) type, ",", LatexWriter::writeType);
             writer.print("\\right)");
         } else
             throw new IllegalArgumentException("Not Implemented");
