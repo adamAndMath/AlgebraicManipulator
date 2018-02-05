@@ -24,7 +24,7 @@ public class WorkProject {
         @Override
         public <T extends WP, R> R get(Path path, BiFunction<Path, T, R> function) {
             if (path == null) return function.apply(null, (T) this);
-            return contents.get(path.getName(0).toString()).get(path.subpath(1, path.getNameCount()), function);
+            return contents.get(path.getName(0).toString()).get(path.getNameCount() == 1 ? null : path.subpath(1, path.getNameCount()), function);
         }
 
         @Override
@@ -85,6 +85,16 @@ public class WorkProject {
     }
 
     private final WPFolder root = new WPFolder();
+
+    public boolean contains(Path path) {
+        try {
+            getFile(path);
+        } catch (Exception e) {
+            return false;
+        }
+
+        return true;
+    }
 
     public WorkFile getFile(Path path) {
         return root.get(path, (Path p, WPFile f) -> f.file);

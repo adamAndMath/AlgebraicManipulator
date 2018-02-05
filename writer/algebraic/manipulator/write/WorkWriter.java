@@ -46,9 +46,8 @@ public class WorkWriter {
         if (!name.equals(path.getFileName().toString()))
             throw new IllegalArgumentException("Named import saving not implemented");
 
+        writer.write("using ");
         writeWorkPath(writer, path);
-
-        writer.write(path.getFileName().toString());
         writer.writeln(";");
     }
 
@@ -69,7 +68,7 @@ public class WorkWriter {
         writer.writeln();
         writeList(writer, Arrays.asList(assumption.getResult()), "=", WorkWriter::writeStatement);
         writer.pop();
-        writer.write(";");
+        writer.writeln(";");
     }
 
     private static void writeWork(CodeWriter writer, String name, Work work) {
@@ -96,22 +95,28 @@ public class WorkWriter {
         writeWorkBody(writer, induction.getBase());
 
         for (String var : induction.getInductive()) {
+            if (induction.getUp(var) != null) {
+                writer.write(" ");
+                writer.write(var);
+                writer.write("+");
+                writeAssumedBody(writer, induction.getUp(var));
+            }
+
             if (induction.getDown(var) != null) {
                 writer.write(" ");
                 writer.write(var);
                 writer.write("-");
                 writeAssumedBody(writer, induction.getDown(var));
             }
-
-            if (induction.getUp(var) != null) {
-                writer.write(" ");
-                writer.write(var);
-                writer.write("-");
-                writeAssumedBody(writer, induction.getUp(var));
-            }
         }
 
         writer.pop();
+        writer.writeln();
+        writer.push();
+        writer.writeln("} result {");
+        writeList(writer, Arrays.asList(induction.getResult()), "=", WorkWriter::writeStatement);
+        writer.pop();
+        writer.writeln();
         writer.writeln("}");
     }
 
@@ -122,13 +127,13 @@ public class WorkWriter {
 
         if (!dummies.isEmpty()) {
             writer.write("<");
-            writeList(writer, dummies, ",", WorkWriter::writeVariable);
+            writeList(writer, dummies, ", ", WorkWriter::writeVariable);
             writer.write(">");
         }
 
         writer.write("(");
         if (!variables.isEmpty())
-            writeList(writer, variables, ",", WorkWriter::writeDefinition);
+            writeList(writer, variables, ", ", WorkWriter::writeDefinition);
 
         writer.write(")");
     }
@@ -140,7 +145,7 @@ public class WorkWriter {
         writeList(writer, work.getManipulations(), CodeWriter::writeln, WorkWriter::writeManipulation);
         writer.pop();
         writer.writeln();
-        writer.writeln("}");
+        writer.write("}");
     }
 
     private static void writeAssumedBody(CodeWriter writer, AssumedWork work) {
@@ -149,8 +154,7 @@ public class WorkWriter {
         writeList(writer, work.getManipulations(), CodeWriter::writeln, WorkWriter::writeManipulation);
         writer.pop();
         writer.writeln();
-        writer.writeln("}");
-        writer.push();
+        writer.write("}");
     }
 
     private static void writeManipulation(CodeWriter writer, Manipulation manipulation) {
@@ -166,7 +170,7 @@ public class WorkWriter {
             writeFromEval(writer, (FromEval) manipulation);
         else writer.error("Unknown manipulations type " + manipulation.getClass());
 
-        writer.writeln(";");
+        writer.write(";");
     }
 
     private static void writeSubstitution(CodeWriter writer, Substitution substitution) {
@@ -186,7 +190,10 @@ public class WorkWriter {
 
         if (!substitution.getValues().stream().allMatch(Objects::isNull)) {
             writer.write("(");
-            writeList(writer, substitution.getValues(), ",", WorkWriter::writeStatement);
+            writeList(writer, substitution.getValues(), ",", (w, s) -> {
+                if (s == null) w.write("-");
+                else writeStatement(w, s);
+            });
             writer.write(")");
         }
 
@@ -298,9 +305,12 @@ public class WorkWriter {
     }
 
     private static void writePositionSiblings(CodeWriter writer, PathTree<?> positions) {
-        if (positions.isLeaf()) return;
+        writer.write("[");
 
-        writeList(writer, positions.keys().boxed().collect(Collectors.toCollection(TreeSet::new)), "|", (w, i) -> writePositions(writer, positions, i));
+        if (!positions.isLeaf())
+            writeList(writer, positions.keys().boxed().collect(Collectors.toCollection(TreeSet::new)), "|", (w, i) -> writePositions(writer, positions, i));
+
+        writer.write("]");
     }
 
     private static void writePositions(CodeWriter writer, PathTree<?> positions, int index) {
@@ -323,6 +333,8 @@ public class WorkWriter {
 
     private static<T> void writeList(CodeWriter writer, Iterable<T> iterable, Consumer<CodeWriter> separator, BiConsumer<CodeWriter, T> function) {
         Iterator<T> it = iterable.iterator();
+
+        if (!it.hasNext()) return;
 
         function.accept(writer, it.next());
 
