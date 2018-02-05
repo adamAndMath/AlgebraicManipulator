@@ -23,6 +23,16 @@ import java.util.stream.IntStream;
 import static java.util.stream.Collectors.toList;
 
 public class WorkWriter {
+    public static Map<Class<? extends Manipulation>, BiConsumer<CodeWriter, Manipulation>> manipulationWriters = new HashMap<>();
+
+    static {
+        manipulationWriters.put(Substitution.class, (w, m) -> writeSubstitution(w, (Substitution) m));
+        manipulationWriters.put(Call.class, (w, m) -> writeCall(w, (Call) m));
+        manipulationWriters.put(Rename.class, (w, m) -> writeRename(w, (Rename) m));
+        manipulationWriters.put(ToEval.class, (w, m) -> writeToEval(w, (ToEval) m));
+        manipulationWriters.put(FromEval.class, (w, m) -> writeFromEval(w, (FromEval) m));
+    }
+
     public static List<String> writeFile(WorkFile file, Path path) throws IOException {
         CodeWriter writer = new CodeWriter(Files.newBufferedWriter(path));
 
@@ -158,17 +168,10 @@ public class WorkWriter {
     }
 
     private static void writeManipulation(CodeWriter writer, Manipulation manipulation) {
-        if (manipulation instanceof Substitution)
-            writeSubstitution(writer, (Substitution) manipulation);
-        else if (manipulation instanceof Call)
-            writeCall(writer, (Call) manipulation);
-        else if (manipulation instanceof Rename)
-            writeRename(writer, (Rename) manipulation);
-        else if (manipulation instanceof ToEval)
-            writeToEval(writer, (ToEval) manipulation);
-        else if (manipulation instanceof FromEval)
-            writeFromEval(writer, (FromEval) manipulation);
-        else writer.error("Unknown manipulations type " + manipulation.getClass());
+        if (manipulationWriters.containsKey(manipulation.getClass()))
+            manipulationWriters.get(manipulation.getClass()).accept(writer, manipulation);
+        else
+            writer.error("Unknown manipulations type " + manipulation.getClass());
 
         writer.write(";");
     }
