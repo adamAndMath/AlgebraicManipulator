@@ -11,7 +11,6 @@ import algebraic.manipulator.type.SimpleType;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class InductionWork extends Equation {
@@ -20,6 +19,15 @@ public class InductionWork extends Equation {
     private final Work base;
     private final AssumedWork[] up;
     private final AssumedWork[] down;
+
+    public InductionWork(List<Variable> dummy, List<Definition> variables, Statement[] result, String[] inductive, Statement[] baseState, Statement origin) {
+        this(dummy, variables, result, inductive, baseState, new Work(dummy, variables, Arrays.stream(result).map(s -> s.set(var -> {
+            for (int i = 0; i < inductive.length; i++)
+                if (inductive[i].equals(var.getName()))
+                    return baseState[i];
+            return var.clone();
+        })).toArray(Statement[]::new), result.length, origin));
+    }
 
     public InductionWork(List<Variable> dummy, List<Definition> variables, Statement[] result, String[] inductive, Statement[] baseState, Work base) {
         super(dummy, variables, result);
