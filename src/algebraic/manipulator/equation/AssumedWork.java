@@ -9,6 +9,7 @@ import algebraic.manipulator.statement.Variable;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -53,9 +54,19 @@ public class AssumedWork extends Equation {
     }
 
     public void apply(WorkProject project, WorkFile file, Manipulation manipulation) {
+        current = manipulation.apply(project, file, this, current);
         manipulations.add(manipulation);
+    }
 
-        for (int i = 0; i < current.length; i++)
-            current[i] = manipulation.apply(project, file, i, current[i]);
+    public void remove(WorkProject project, WorkFile file) {
+        manipulations.remove(manipulations.size() - 1);
+        recalculate(project, file);
+    }
+
+    private void recalculate(WorkProject project, WorkFile file) {
+        current = origin;
+
+        for (Manipulation manipulation : manipulations)
+            current = manipulation.apply(project, file, this, current);
     }
 }
