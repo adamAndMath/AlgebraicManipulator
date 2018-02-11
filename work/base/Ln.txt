@@ -1,6 +1,15 @@
 assume Ln(Complex a)
     ln(a)=log(\e,a);
 
+work Pow(Complex a) {
+	let 3 a;
+	substitute Log.Pow[0->1](\e,-):1;
+	substitute Log.Pow[0->2](\e,-):2;
+	substitute Ln[1->0]:[1|2,1];
+} result {
+	a=ln(pow(\e,a))=pow(\e,ln(a))
+}
+
 work Inverse() {
 	let 2 log(\e,\e);
 	substitute Log.Inverse[0->1]:1;
