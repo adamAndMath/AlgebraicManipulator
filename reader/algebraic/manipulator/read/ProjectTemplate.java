@@ -88,7 +88,7 @@ public class ProjectTemplate {
         List<Set<Integer>> graph = files.stream()
                 .map(f -> f.getDependencies().map(Path::getParent).map(p -> {
                     if (!indexMap.containsKey(p))
-                        throw new IllegalStateException("Unknown file " + p);
+                        throw new IllegalStateException(f.getPath() + ": Unknown file " + p);
                     return indexMap.get(p);
                 }).collect(Collectors.toSet()))
                 .collect(Collectors.toCollection(ArrayList::new));
