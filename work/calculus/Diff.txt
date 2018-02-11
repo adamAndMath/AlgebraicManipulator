@@ -2,6 +2,9 @@ using base.Add;
 using base.Sub;
 using base.Mult;
 using base.Div;
+using base.Pow;
+using base.Log;
+using base.Ln;
 
 assume Lim<h>(Func<Complex,Complex> f, Complex x)
     diff(eval(f,x),x)=lim<h>(0,div(sub(eval(f,add(x,h)),eval(f,x)),h));
@@ -164,6 +167,95 @@ work Constant(Complex a, Complex x) {
     diff(a,x)=0
 }
 
-/*work Pow(Complex a, Complex x) {
-    let 2 diff(pow(x,a),x);
-}*/
+work Line(Complex x) {
+	let 2 diff(x,x);
+	toeval(y:[]):1,0;
+	substitute Lim[0->1]<h>:1;
+	fromeval:1,1,0,[0|1];
+	substitute Add.Commute[0->1]:1,1,0,0;
+	substitute Sub.Add1[1->0]:1,1,0;
+	substitute Lim.Div[0->1]<h>:1;
+} result {
+	diff(x,x)=1
+}
+
+work Log(Complex a, Complex x) {
+	let 2 diff(log(a,x),x);
+	toeval(b:[1]):1,0;
+	substitute Lim[0->1]<h>:1;
+	fromeval:1,1,0,[0|1];
+	substitute Log.DistributeSub[1->0]:1,1,0;
+	substitute Div.Distribute[0->1]:1,1,0,1;
+	substitute Div.Inverse[0->1]:1,1,0,1,0;
+	substitute Div.Mult1[0->2](-,x):1,1,1;
+	substitute Div.Commute[2->0]:1,1;
+	substitute Div.Mult2[0->1]:1,1,0;
+	substitute Log.Mult[1->0]:1,1,0;
+	toeval(t:[0,1|1,1]):1,1,0,1;
+	toeval(u:[1,0]):1,1,0,1;
+	toeval(v:[0,1]):1,1;
+	substitute Lim.Func[0->1]<h>:1;
+	fromeval:1;
+	fromeval:1,0,1,1;
+	toeval(v:[0]):1,0,1,1,1;
+	substitute Lim.Func[0->2]<h>:1,0,1;
+	fromeval:1,0,1,[0|1];
+	substitute Div.Singularity[1->0]:1,0,1,0;
+	substitute Lim.Euler[1->0]<h>:1,0,1;
+	substitute Ln.ChangeBase[0->1]:1,0;
+	substitute Ln.Inverse[0->1]:1,0,0;
+	substitute Div.Commute[1->2]:1;
+} result {
+	diff(log(a,x),x)=div(1,mult(x,ln(a)))
+}
+
+work Exponential(Complex a, Complex x) {
+	let 2 diff(pow(a,x),pow(a,x));
+	substitute Log.Pow[0->2](a,-):0,0;
+	toeval(g:[1]):0,0;
+	toeval(y:[1]):0,0,1;
+	substitute Chain[0->1]:0;
+	fromeval:0,0,0;
+	fromeval:0,[0,[0,1|1]|1,0];
+	substitute Log.Pow[1->0]:0,0,[0,1|1];
+	substitute Log[0->1]:0,1;
+	substitute Line[0->1]:1;
+	substitute Div.Mult2[1->0]:0;
+	call t mult(t,mult(pow(a,x),ln(a)));
+	substitute Div.Mult1[2->0]:0;
+	substitute Mult.Identity[2->0]:1;
+	substitute Mult.Commute[0->1]:1;
+} result {
+	diff(pow(a,x),x)=mult(ln(a),pow(a,x))
+}
+
+work Pow(Complex x, Complex n) {
+	let 2 diff(pow(x,n),x);
+	substitute Ln.Pow[0->2]:1,0,0;
+	substitute Pow.Combine[0->1]:1,0;
+	toeval(g:[1]):1,0;
+	toeval(y:[0,0]):1,0,1;
+	substitute Chain[0->1]:1;
+	fromeval:1,[0,[0,1|1]|1,0];
+	fromeval:1,0,0;
+	toeval(g:[0]):1,1,0,0;
+	substitute Mult.Commute[0->1]:1,1,0;
+	substitute Factor[0->1]:1,1;
+	fromeval:1,1,1,0;
+	substitute Ln.Ln[0->1]:1,1,1,0;
+	substitute Log[0->1]:1,1,1;
+	substitute Exponential[0->1]:1,0;
+	substitute Ln.Inverse[0->1]:1,[0,0|1,1,1,1];
+	substitute Mult.Identity[1->0]:1,1,1,1;
+	substitute Mult.Identity[2->0]:1,0;
+	substitute Mult.Associate[1->0]:1;
+	substitute Mult.Commute[0->1]:1,0;
+	substitute Mult.Associate[0->1]:1;
+	substitute Div.Mult2[1->0]:1,1;
+	substitute Pow.Combine[1->0]:1,1,0;
+	substitute Ln.Pow[2->0]:1,1,0,0;
+	substitute Pow.Identity[1->0]:1,1,1;
+	substitute Pow.Division[1->0]:1,1;
+} result {
+	diff(pow(x,n),x)=mult(n,pow(x,sub(n,1)))
+}
