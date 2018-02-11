@@ -226,10 +226,13 @@ public class WorkWriter {
             w.write(par.getVariable());
 
             if (par.getPositions().isLeaf())
-                writer.write(":[]");
+                w.write(":[]");
             else if (!par.getPositions().isEmpty()) {
-                writer.write(":");
+                w.write(":");
                 writePositionSiblings(writer, par.getPositions());
+            } else {
+                w.write("=");
+                writeStatement(w, par.getStatement());
             }
         });
         writer.write("):");
