@@ -13,6 +13,9 @@ public abstract class Statement {
     public abstract Set<String> getVariables();
     public abstract Set<String> getDummies();
 
+    @Override
+    public abstract String toString();
+
     public<T> void get(PathTree<T> positions, BiConsumer<T, Statement> consumer) {
         if (positions == null || positions.isEmpty()) return;
 

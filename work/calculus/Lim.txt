@@ -12,3 +12,6 @@ assume Func2<x>(Complex a, Func<List<Complex,Complex>,Complex> f, Func<Complex,C
 
 assume Reciprocal<x>(Complex a)
     lim<x>(\inf,div(1,x))=0;
+
+assume Euler<h>()
+    \e=lim<h>(0,pow(add(1,h),div(1,h)));

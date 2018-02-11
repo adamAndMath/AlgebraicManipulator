@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 public class Work extends Equation {
     private final Statement origin;
     private final int amount;
-    private final List<Manipulation> manipulations = new ArrayList<>();
+    private final List<Manipulation> manipulations = new LinkedList<>();
     private Statement[] current;
 
     public Work(List<Variable> dummy, List<Definition> variables, Statement[] result, int amount, Statement origin) {
@@ -55,18 +55,20 @@ public class Work extends Equation {
     }
 
     public void apply(WorkProject project, WorkFile file, Manipulation manipulation) {
+        current = manipulation.apply(project, file, this, current);
         manipulations.add(manipulation);
-        for (int i = 0; i < amount; i++) {
-            current[i] = manipulation.apply(project, file, i, current[i]);
+    }
 
-            Set<String> variables = new HashSet<>(variableNames());
+    public void remove(WorkProject project, WorkFile file) {
+        manipulations.remove(manipulations.size() - 1);
+        recalculate(project, file);
+    }
 
-            if (variables.stream().anyMatch(current[i].getDummies()::contains))
-                throw new IllegalArgumentException("A variable and a dummy can not have the same name");
+    private void recalculate(WorkProject project, WorkFile file) {
+        current = new Statement[amount];
+        Arrays.fill(current, origin);
 
-            for (String var : current[i].getVariables())
-                if (!variables.contains(var))
-                    throw new IllegalArgumentException("Undefined variable: " + var);
-        }
+        for (Manipulation manipulation : manipulations)
+            current = manipulation.apply(project, file, this, current);
     }
 }

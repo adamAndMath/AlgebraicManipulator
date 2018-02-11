@@ -8,10 +8,7 @@ import algebraic.manipulator.statement.Statement;
 import algebraic.manipulator.statement.Variable;
 
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class Substitution implements Manipulation {
@@ -49,6 +46,14 @@ public class Substitution implements Manipulation {
 
     public PathTree<?> getPosition() {
         return position;
+    }
+
+    public List<String> getDummy() {
+        return Collections.unmodifiableList(dummy);
+    }
+
+    public List<Statement> getValues() {
+        return Collections.unmodifiableList(values);
     }
 
     @Override

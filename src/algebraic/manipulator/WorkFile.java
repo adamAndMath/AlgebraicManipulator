@@ -17,7 +17,7 @@ public class WorkFile {
     }
 
     public void add(String name, Equation equation) {
-        if (equations.containsKey(name))
+        if (contains(name))
             throw new IllegalArgumentException("There already exists a work named " + name);
 
         names.add(name);
@@ -32,8 +32,12 @@ public class WorkFile {
         return names.stream();
     }
 
+    public boolean contains(String name) {
+        return equations.containsKey(name);
+    }
+
     public Equation get(String name) {
-        if (!equations.containsKey(name))
+        if (!contains(name))
             throw new IllegalArgumentException("There are no equation by the name " + name);
 
         return equations.get(name);
@@ -51,6 +55,10 @@ public class WorkFile {
         if (using.containsKey(key))
             throw new IllegalArgumentException(key + " is already imported");
         using.put(key, path);
+    }
+
+    public Map<String, Path> getUsing() {
+        return Collections.unmodifiableMap(using);
     }
 
     public Path absolutePath(Path path) {
