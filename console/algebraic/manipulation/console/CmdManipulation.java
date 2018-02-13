@@ -15,7 +15,8 @@ import java.util.stream.Stream;
 import static algebraic.manipulation.console.Main.*;
 
 public class CmdManipulation {
-    private static final Map<String, Function<WorkFile, InputSupplier<? extends Manipulation>>> manipulations = new HashMap<>();
+    private static final Map<String, Function<WorkFile, InputSupplier<? extends Manipulation>>> manipulations
+            = new HashMap<>();
 
     static {
         manipulations.put("call", CmdManipulation::call);

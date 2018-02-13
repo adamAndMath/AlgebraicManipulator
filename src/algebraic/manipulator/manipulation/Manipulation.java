@@ -10,11 +10,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public interface Manipulation {
-    Stream<Path> getDependencies(WorkFile file);
-    Statement apply(WorkProject project, WorkFile file, int i, Statement statement);
+public abstract class Manipulation {
+    public abstract Stream<Path> getDependencies(WorkFile file);
+    public abstract Statement apply(WorkProject project, WorkFile file, int i, Statement statement);
 
-    default Statement[] apply(WorkProject project, WorkFile file, Equation equation, Statement[] statements) {
+    public Statement[] apply(WorkProject project, WorkFile file, Equation equation, Statement[] statements) {
         Statement[] result = new Statement[statements.length];
 
         for (int i = 0; i < statements.length; i++) {

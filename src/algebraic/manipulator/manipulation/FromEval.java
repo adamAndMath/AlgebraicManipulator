@@ -12,11 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public class FromEval implements Manipulation {
-    private final PathTree<?> position;
-
+public class FromEval extends PathManipulation {
     public FromEval(PathTree<?> position) {
-        this.position = position;
+        super(position);
     }
 
     @Override
@@ -24,16 +22,8 @@ public class FromEval implements Manipulation {
         return Stream.empty();
     }
 
-    public PathTree<?> getPosition() {
-        return position;
-    }
-
     @Override
-    public Statement apply(WorkProject project, WorkFile file, int i, Statement statement) {
-        return statement.replace(position.sub(i), (o, s) -> replace(s));
-    }
-
-    private Statement replace(Statement statement) {
+    protected Statement replace(WorkProject project, WorkFile file, Statement statement) {
         if (!(statement instanceof Operation && "eval".equals(((Operation) statement).getName())))
             throw new IllegalStateException("Invalid statement: " + statement.toString());
 

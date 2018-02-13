@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.*;
 
-public class ToEval implements Manipulation {
+public class ToEval extends PathManipulation {
     public static class Parameter {
         private final String variable;
         private final Statement statement;
@@ -42,18 +42,13 @@ public class ToEval implements Manipulation {
         }
     }
 
-    private final PathTree<?> position;
     private final PathTree<Parameter> tree;
     private final Parameter[] parameters;
 
     public ToEval(PathTree<?> position, Parameter... parameters) {
-        this.position = position;
+        super(position);
         this.parameters = parameters.clone();
         tree = new PathTree<>(Arrays.asList(parameters), Parameter::getPositions, Function.identity());
-    }
-
-    public PathTree<?> getPosition() {
-        return position;
     }
 
     public PathTree<Parameter> getTree() {
@@ -74,11 +69,7 @@ public class ToEval implements Manipulation {
     }
 
     @Override
-    public Statement apply(WorkProject project, WorkFile file, int i, Statement statement) {
-        return statement.replace(position.sub(i), (o, s) -> replace(s));
-    }
-
-    private Operation replace(Statement statement) {
+    protected Operation replace(WorkProject project, WorkFile file, Statement statement) {
         Map<String, Statement> pars = new HashMap<>();
 
         Arrays.stream(parameters).filter(par -> par.getStatement() != null).forEach(par -> pars.put(par.getVariable(), par.getStatement()));

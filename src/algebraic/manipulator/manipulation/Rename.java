@@ -11,19 +11,14 @@ import java.nio.file.Path;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-public class Rename implements Manipulation {
-    private final PathTree<?> position;
+public class Rename extends PathManipulation {
     private final String from;
     private final String to;
 
     public Rename(PathTree<?> position, String from, String to) {
-        this.position = position;
+        super(position);
         this.from = from;
         this.to = to;
-    }
-
-    public PathTree<?> getPosition() {
-        return position;
     }
 
     public String getFrom() {
@@ -40,11 +35,7 @@ public class Rename implements Manipulation {
     }
 
     @Override
-    public Statement apply(WorkProject project, WorkFile file, int i, Statement statement) {
-        return statement.replace(position, (o, s) -> rename(s));
-    }
-
-    private Statement rename(Statement statement) {
+    protected Statement replace(WorkProject project, WorkFile file, Statement statement) {
         if (!(statement instanceof Operation))
             throw new IllegalArgumentException("Rename can only be applied to an operation");
 

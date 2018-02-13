@@ -127,6 +127,13 @@ public class PathTree<T> {
         return children.size();
     }
 
+    public int min() {
+        return children.keySet().stream().min(Integer::compareTo).get();
+    }
+    public int max() {
+        return children.keySet().stream().max(Integer::compareTo).get();
+    }
+
     public IntStream keys() {
         return children.keySet().stream().mapToInt(i -> i);
     }

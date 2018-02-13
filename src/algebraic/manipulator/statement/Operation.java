@@ -101,6 +101,9 @@ public class Operation extends Statement {
         if (positions.isLeaf()) {
             consumer.accept(positions.getLeaf(), this);
         } else {
+            if (positions.min() < 0 || positions.max() >= parameters.length)
+                throw new IllegalArgumentException("Invalid Path");
+
             for (int i = 0; i < parameters.length; i++)
                 parameters[i].get(positions.sub(i), consumer);
         }
@@ -143,6 +146,9 @@ public class Operation extends Statement {
 
         if (positions.isLeaf())
             return function.apply(positions.getLeaf(), this);
+
+        if (positions.min() < 0 || positions.max() >= parameters.length)
+            throw new IllegalArgumentException("Invalid Path");
 
         return new Operation(
                 getName(),

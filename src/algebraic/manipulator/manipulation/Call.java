@@ -9,7 +9,7 @@ import java.nio.file.Path;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public class Call implements Manipulation {
+public class Call extends Manipulation {
     private final String temp;
     private final Statement call;
 

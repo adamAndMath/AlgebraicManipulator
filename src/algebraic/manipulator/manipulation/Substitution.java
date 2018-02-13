@@ -11,19 +11,18 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.stream.Stream;
 
-public class Substitution implements Manipulation {
+public class Substitution extends PathManipulation {
     private final Path workPath;
     private final int from;
     private final int to;
-    private final PathTree<?> position;
     private final List<String> dummy;
     private final List<Statement> values;
 
     public Substitution(Path workPath, int from, int to, PathTree<?> position, List<String> dummy, List<Statement> values) {
+        super(position);
         this.workPath = workPath;
         this.from = from;
         this.to = to;
-        this.position = position;
         this.dummy = dummy;
         this.values = values;
     }
@@ -44,10 +43,6 @@ public class Substitution implements Manipulation {
         return to;
     }
 
-    public PathTree<?> getPosition() {
-        return position;
-    }
-
     public List<String> getDummy() {
         return Collections.unmodifiableList(dummy);
     }
@@ -62,7 +57,7 @@ public class Substitution implements Manipulation {
     }
 
     @Override
-    public Statement apply(WorkProject project, WorkFile file, int i, Statement statement) {
+    protected Statement replace(WorkProject project, WorkFile file, Statement statement) {
         Equation work = getWork(project, file);
 
         if (values.size() != work.variableNames().size())
@@ -71,10 +66,6 @@ public class Substitution implements Manipulation {
         if (dummy.size() != work.dummies().size())
             throw new IllegalStateException("Dummy count does't match referred work");
 
-        return statement.replace(position.sub(i), (o, s) -> replace(s, work));
-    }
-
-    private Statement replace(Statement statement, Equation work) {
         Statement fromStatement = work.getStatement(from);
         Set<String> dummies = fromStatement.getDummies();
 
