@@ -6,7 +6,7 @@ import algebraic.manipulator.statement.Operation;
 import algebraic.manipulator.statement.Statement;
 import algebraic.manipulator.statement.Variable;
 import algebraic.manipulator.type.Func;
-import algebraic.manipulator.type.ListType;
+import algebraic.manipulator.type.TupleType;
 import algebraic.manipulator.type.SimpleType;
 import algebraic.manipulator.type.Type;
 
@@ -105,9 +105,9 @@ public class LatexWriter {
             writer.print(" \\rightarrow ");
             writeType(writer, ((Func) type).to);
             writer.print("\\right)");
-        } else if (type instanceof ListType) {
+        } else if (type instanceof TupleType) {
             writer.print("\\left(");
-            writeList(writer, (ListType) type, ",", LatexWriter::writeType);
+            writeList(writer, (TupleType) type, ",", LatexWriter::writeType);
             writer.print("\\right)");
         } else
             throw new IllegalArgumentException("Not Implemented");

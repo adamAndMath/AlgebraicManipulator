@@ -4,10 +4,10 @@ using base.Mult;
 using base.Div;
 using base.Pow;
 
-assume Prod<i,r>(Func<List<Integer,Complex>,Complex> f, Integer a, Integer b)
+assume Prod<i,r>((Integer,Complex) -> Complex f, Integer a, Integer b)
     prod<i>(eval(f,i),a,b)=rec<i,r>(mult(r,eval(f,sub(add(i,a),1))),1,add(sub(b,a),1));
 
-work Identity<i>(Func<Integer,Complex> f, Integer a) {
+work Identity<i>(Integer -> Complex f, Integer a) {
     let 2 prod<i>(eval(f,i),a,sub(a,1));
     substitute Prod[0->1]<i,r>:1;
     toeval(j:[1,1,0,0],q:[0]):1,0;
@@ -19,7 +19,7 @@ work Identity<i>(Func<Integer,Complex> f, Integer a) {
     prod<i>(eval(f,i),a,sub(a,1))=1
 }
 
-work Rec<i>(Func<Integer,Complex> f, Integer a, Integer b) {
+work Rec<i>(Integer -> Complex f, Integer a, Integer b) {
     let 2 prod<i>(eval(f,i),a,b);
     substitute Prod[0->1]<i,r>:1;
     toeval(j:[1,1,0,0],q:[0]):1,0;
@@ -36,7 +36,7 @@ work Rec<i>(Func<Integer,Complex> f, Integer a, Integer b) {
     prod<i>(eval(f,i),a,b)=mult(prod<i>(eval(f,i),a,sub(b,1)),eval(f,b))
 }
 
-work Single<i>(Func<Integer,Complex> f, Integer a) {
+work Single<i>(Integer -> Complex f, Integer a) {
     let 2 prod<i>(eval(f,i),a,a);
     substitute Rec[0->1]<i>:1;
     substitute Identity[0->1]<i>:1,0;
@@ -45,7 +45,7 @@ work Single<i>(Func<Integer,Complex> f, Integer a) {
      prod<i>(eval(f,i),a,a)=eval(f,a)
  }
 
-induction Rec2<i>(Func<Integer,Complex> f, Integer a, Integer b) {
+induction Rec2<i>(Integer -> Complex f, Integer a, Integer b) {
     base b=a {
         let 2 prod<i>(eval(f,i),a,a);
         substitute Rec[0->1]<i>:1;
@@ -68,7 +68,7 @@ induction Rec2<i>(Func<Integer,Complex> f, Integer a, Integer b) {
     prod<i>(eval(f,i),a,b)=mult(eval(f,a),prod<i>(eval(f,i),add(a,1),b))
 }
 
-work IndexShift<i>(Func<Integer,Complex> f, Integer a, Integer b, Integer c) {
+work IndexShift<i>(Integer -> Complex f, Integer a, Integer b, Integer c) {
     let 2 prod<i>(eval(f,i),a,b);
     substitute Prod[0->1]<i,r>:1;
     substitute Sub.Add1[0->1](-,c):1,[2,0,0|0,1,1];
@@ -82,7 +82,7 @@ work IndexShift<i>(Func<Integer,Complex> f, Integer a, Integer b, Integer c) {
     prod<i>(eval(f,i),a,b)=prod<i>(eval(f,sub(i,c)),add(a,c),add(b,c))
 }
 
-induction Reverse<i>(Func<Integer,Complex> f, Integer a, Integer b) {
+induction Reverse<i>(Integer -> Complex f, Integer a, Integer b) {
     base a=0,b=0 {
         let 2 prod<i>(eval(f,i),0,0);
         substitute Single[0->1]<i>:1;
@@ -136,7 +136,7 @@ induction Reverse<i>(Func<Integer,Complex> f, Integer a, Integer b) {
     prod<i>(eval(f,i),a,b)=prod<i>(eval(f,sub(0,i)),sub(0,b),sub(0,a))
 }
 
-induction RangeSplit<i,j>(Func<Integer,Complex> f, Integer a, Integer b, Integer c) {
+induction RangeSplit<i,j>(Integer -> Complex f, Integer a, Integer b, Integer c) {
     base c=b {
         let 2 prod<i>(eval(f,i),a,b);
         substitute Mult.Identity[0->1]:1;
@@ -159,7 +159,7 @@ induction RangeSplit<i,j>(Func<Integer,Complex> f, Integer a, Integer b, Integer
     prod<i>(eval(f,i),a,c)=mult(prod<i>(eval(f,i),a,b),prod<j>(eval(f,j),add(b,1),c))
 }
 
-induction Distribute<i,j>(Func<Integer,Complex> f, Func<Integer,Complex> g, Integer a, Integer b) {
+induction Distribute<i,j>(Integer -> Complex f, Integer -> Complex g, Integer a, Integer b) {
     base b=a {
         let 2 mult(eval(f,a),eval(g,a));
         toeval(k:[0,1|1,1]):0;
@@ -204,7 +204,7 @@ induction Distribute<i,j>(Func<Integer,Complex> f, Func<Integer,Complex> g, Inte
     prod<i>(mult(eval(f,i),eval(g,i)),a,b)=mult(prod<i>(eval(f,i),a,b),prod<j>(eval(g,j),a,b))
 }
 
-induction Commute<i,j>(Func<List<Integer,Integer>,Complex> f, Integer a1, Integer b1, Integer a2, Integer b2) {
+induction Commute<i,j>((Integer,Integer) -> Complex f, Integer a1, Integer b1, Integer a2, Integer b2) {
     base b1=a1, b2=a2 {
         let 2 eval(f,a1,a2);
         toeval(a:[1]):[0|1];
@@ -269,7 +269,7 @@ induction Commute<i,j>(Func<List<Integer,Integer>,Complex> f, Integer a1, Intege
     prod<i>(prod<j>(eval(f,i,j),a2,b2),a1,b1)=prod<j>(prod<i>(eval(f,i,j),a1,b1),a2,b2)
 }
 
-induction TriangleCommute<i,j>(Func<List<Integer,Integer>,Complex> f, Integer a, Integer n) {
+induction TriangleCommute<i,j>((Integer,Integer) -> Complex f, Integer a, Integer n) {
     base n=a {
         let 2 eval(f,a,a);
         toeval(k:[2]):0;

@@ -1,13 +1,13 @@
 assume Div<x>(Complex a)
     lim<x>(a,div(x,x))=1;
 
-assume Resolve<x>(Complex a, Func<Complex,Complex> f)
+assume Resolve<x>(Complex a, Complex -> Complex f)
     lim<x>(a,eval(f,x))=eval(f,a);
 
-assume Func<x>(Complex a, Func<Complex,Complex> f, Func<Complex,Complex> g)
+assume Func<x>(Complex a, Complex -> Complex f, Complex -> Complex g)
     lim<x>(a,eval(f,eval(g,x)))=eval(f,lim<x>(a,eval(g,x)))=lim<x>(eval(g,a),eval(f,x));
 
-assume Func2<x>(Complex a, Func<List<Complex,Complex>,Complex> f, Func<Complex,Complex> g, Func<Complex,Complex> h)
+assume Func2<x>(Complex a, (Complex,Complex) -> Complex f, Complex -> Complex g, Complex -> Complex h)
     lim<x>(a,eval(f,eval(g,x),eval(h,x)))=eval(f,lim<x>(a,eval(g,x)),lim<x>(a,eval(h,x)));
 
 assume Reciprocal<x>(Complex a)

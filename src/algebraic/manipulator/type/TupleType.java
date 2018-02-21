@@ -5,10 +5,10 @@ import java.util.Iterator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ListType implements Type, Iterable<Type> {
+public class TupleType implements Type, Iterable<Type> {
     private final Type[] types;
 
-    public ListType(Type... types) {
+    public TupleType(Type... types) {
         this.types = types;
     }
 
@@ -25,14 +25,14 @@ public class ListType implements Type, Iterable<Type> {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ListType)) return false;
-        ListType listType = (ListType) o;
-        return Arrays.equals(getTypes(), listType.getTypes());
+        if (!(o instanceof TupleType)) return false;
+        TupleType tupleType = (TupleType) o;
+        return Arrays.equals(getTypes(), tupleType.getTypes());
     }
 
     @Override
     public boolean is(Type type) {
-        return type instanceof ListType && Arrays.equals(types, ((ListType) type).types);
+        return type instanceof TupleType && Arrays.equals(types, ((TupleType) type).types);
     }
 
     public Type[] getTypes() {

@@ -6,10 +6,10 @@ using base.Pow;
 using base.Log;
 using base.Ln;
 
-assume Lim<h>(Func<Complex,Complex> f, Complex x)
+assume Lim<h>(Complex -> Complex f, Complex x)
     diff(eval(f,x),x)=lim<h>(0,div(sub(eval(f,add(x,h)),eval(f,x)),h));
 
-work Factor(Func<Complex,Complex> f, Complex a, Complex x) {
+work Factor(Complex -> Complex f, Complex a, Complex x) {
     let 2 diff(mult(a,eval(f,x)),x);
     toeval(v=x:[1,1]):1,0;
     substitute Lim[0->1]<h>:1;
@@ -26,7 +26,7 @@ work Factor(Func<Complex,Complex> f, Complex a, Complex x) {
     diff(mult(a,eval(f,x)),x)=mult(a,diff(eval(f,x),x))
 }
 
-work Distribute(Func<Complex,Complex> f, Func<Complex,Complex> g, Complex x) {
+work Distribute(Complex -> Complex f, Complex -> Complex g, Complex x) {
     let 2 diff(add(eval(f,x),eval(g,x)),x);
     toeval(v:[0,1|1,1]):1,0;
     substitute Lim[0->1]<h>:1;
@@ -45,7 +45,7 @@ work Distribute(Func<Complex,Complex> f, Func<Complex,Complex> g, Complex x) {
     diff(add(eval(f,x),eval(g,x)),x)=add(diff(eval(f,x),x),diff(eval(g,x),x))
 }
 
-work DistributeSub(Func<Complex,Complex> f, Func<Complex,Complex> g, Complex x) {
+work DistributeSub(Complex -> Complex f, Complex -> Complex g, Complex x) {
     let 2 diff(sub(eval(f,x),eval(g,x)),x);
     substitute Sub.Add2[0->1]:1,0;
     substitute Mult.Sub[0->1]:1,0,1;
@@ -59,7 +59,7 @@ work DistributeSub(Func<Complex,Complex> f, Func<Complex,Complex> g, Complex x) 
     diff(sub(eval(f,x),eval(g,x)),x)=sub(diff(eval(f,x),x),diff(eval(g,x),x))
 }
 
-work Product(Func<Complex,Complex> f, Func<Complex,Complex> g, Complex x) {
+work Product(Complex -> Complex f, Complex -> Complex g, Complex x) {
     let 2 diff(mult(eval(f,x),eval(g,x)),x);
     toeval(v:[0,1|1,1]):1,0;
     substitute Lim[0->1]<h>:1;
@@ -127,7 +127,7 @@ work Product(Func<Complex,Complex> f, Func<Complex,Complex> g, Complex x) {
     diff(mult(eval(f,x),eval(g,x)),x)=add(mult(diff(eval(f,x),x),eval(g,x)),mult(eval(f,x),diff(eval(g,x),x)))
 }
 
-work Chain(Func<Complex,Complex> f, Func<Complex,Complex> g, Complex x) {
+work Chain(Complex -> Complex f, Complex -> Complex g, Complex x) {
     let 2 diff(eval(f,eval(g,x)),x);
     toeval(v:[1,1]):1,0;
     substitute Lim[0->1]<h>:1;

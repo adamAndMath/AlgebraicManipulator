@@ -9,7 +9,7 @@ import algebraic.manipulator.read.equation.WorkTemplate;
 import algebraic.manipulator.read.manipulation.*;
 import algebraic.manipulator.statement.*;
 import algebraic.manipulator.type.Func;
-import algebraic.manipulator.type.ListType;
+import algebraic.manipulator.type.TupleType;
 import algebraic.manipulator.type.SimpleType;
 import algebraic.manipulator.type.Type;
 
@@ -45,19 +45,6 @@ public class WorkReader {
         manipulationReaders.put("fromeval", FromEvalTemplate::new);
         manipulationReaders.put("toeval", ToEvalTemplate::new);
         manipulationReaders.put("rename", RenameTemplate::new);
-    }
-
-    public static int[][] readPositions(TokenReader reader) throws IOException {
-        reader.assertIgnore(Token.LSQR);
-
-        if (reader.isRead(Token.RSQR))
-            return new int[0][];
-
-        int[][] positions = reader.readList(Token.VBAR, r -> r.readList(Token.COMMA, TokenReader::readInt).stream().mapToInt(i -> i).toArray()).toArray(new int[0][]);
-
-        reader.assertIgnore(Token.RSQR);
-
-        return positions;
     }
 
     public static PathTree<?> readPaths(TokenReader reader) throws IOException {
@@ -143,24 +130,22 @@ public class WorkReader {
     }
 
     public static Type readType(TokenReader reader) throws IOException {
-        String name = reader.readString();
+        Type first = readTypeIn(reader);
 
-        switch (name) {
-            case "Func":
-                reader.assertIgnore(Token.LESS);
-                Type from = readType(reader);
-                reader.assertIgnore(Token.COMMA);
-                Type to = readType(reader);
-                reader.assertIgnore(Token.GREAT);
-                return new Func(from, to);
-            case "List":
-                reader.assertIgnore(Token.LESS);
-                List<Type> types = reader.readList(Token.COMMA, WorkReader::readType);
-                reader.assertIgnore(Token.GREAT);
-                return new ListType(types.toArray(new Type[0]));
-            default:
-                return new SimpleType(name);
+        if (reader.isRead(Token.ARROW))
+            return new Func(first, readTypeIn(reader));
+
+        return first;
+    }
+
+    public static Type readTypeIn(TokenReader reader) throws IOException {
+        if (reader.isRead(Token.LPAR)) {
+            List<Type> types = reader.readList(Token.COMMA, WorkReader::readType);
+            reader.assertIgnore(Token.RPAR);
+            return new TupleType(types.toArray(new Type[0]));
         }
+
+        return new SimpleType(reader.readString());
     }
 
     public static ManipulationTemplate readManipulation(TokenReader reader) throws IOException {
@@ -210,9 +195,9 @@ public class WorkReader {
 
             reader.assertIgnore(Token.LPAR);
 
-            List<Definition> parameters = reader.isCurrent(Token.STRING)
-                    ? reader.readList(Token.COMMA, WorkReader::readDefinition)
-                    : new ArrayList<>();
+            List<Definition> parameters = reader.isCurrent(Token.RPAR)
+                    ? new ArrayList<>()
+                    : reader.readList(Token.COMMA, WorkReader::readDefinition);
 
             reader.assertIgnore(Token.RPAR);
 

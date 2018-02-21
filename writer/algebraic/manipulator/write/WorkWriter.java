@@ -7,7 +7,7 @@ import algebraic.manipulator.equation.*;
 import algebraic.manipulator.manipulation.*;
 import algebraic.manipulator.statement.*;
 import algebraic.manipulator.type.Func;
-import algebraic.manipulator.type.ListType;
+import algebraic.manipulator.type.TupleType;
 import algebraic.manipulator.type.SimpleType;
 import algebraic.manipulator.type.Type;
 
@@ -249,17 +249,15 @@ public class WorkWriter {
             writer.write(((SimpleType) type).getName());
         else if (type instanceof Func) {
             Func func = (Func) type;
-            writer.write("Func<");
             writeType(writer, func.from);
-            writer.write(",");
+            writer.write(" -> ");
             writeType(writer, func.to);
-            writer.write(">");
         }
-        else if (type instanceof ListType) {
-            ListType list = (ListType) type;
-            writer.write("List<");
+        else if (type instanceof TupleType) {
+            TupleType list = (TupleType) type;
+            writer.write("(");
             writeList(writer, list, ",", WorkWriter::writeType);
-            writer.write(">");
+            writer.write(")");
         }
         else throw new IllegalArgumentException("Unknown type " + type.getClass());
     }
